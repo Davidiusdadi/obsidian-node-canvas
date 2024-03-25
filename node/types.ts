@@ -10,8 +10,6 @@ export interface ExecutionContext {
 }
 
 
-
-
 const zEdgeEnd = z.enum(['none', 'arrow'])
 export const ZEdge = z.object({
     id: z.string(),
@@ -33,8 +31,8 @@ export const ZEdge = z.object({
         direction = 'bi'
     }
 
-    console.log('zdirection: ', direction, v.fromEnd, v.toEnd, v)
     return {
+        id: v.id,
         'type': 'arrow',
         from: v.fromNode,
         to: v.toNode,
@@ -46,8 +44,10 @@ export const ZEdge = z.object({
 export const ZBaseNode = z.object({
     id: z.string(),
     edges: z.array(ZEdge).default([]),
-    fn: z.function().optional().default((() => {
-    }) as any).transform(((ctx, input) => input) satisfies Fn),
+    fn: z.undefined().optional()
+        .transform((fn) => {
+            return ((ctx, input) => input) satisfies Fn
+        }),
 })
 
 
@@ -84,7 +84,7 @@ export const ZEmpty = ZBaseNode.extend({
 }).strip().transform((v) => {
     return {
         id: v.id,
-        type: 'start' as const,
+        type: 'noop' as const,
         edges: v.edges,
         fn: v.fn
     }

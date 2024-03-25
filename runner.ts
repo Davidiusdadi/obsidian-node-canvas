@@ -147,7 +147,7 @@ async function parseCanvas(): Promise<Map<string, CNode>> {
         input: undefined
     }
 
-    const stack_push = (edges: z.output<typeof ZEdge>[], value: any, back=false) => {
+    const stack_push = (edges: z.output<typeof ZEdge>[], value: any, back = false) => {
         const insert = edges.map(e => {
             const node = node_data.get(e.to)!
             return {
@@ -155,7 +155,7 @@ async function parseCanvas(): Promise<Map<string, CNode>> {
                 input: value
             }
         })
-        if(back) {
+        if (back) {
             stack.push(...insert)
         } else {
             stack.unshift(...insert)
