@@ -1,0 +1,45 @@
+{
+  "name": "crawl",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "license": "private",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "dev": "esbuild runner.ts --bundle --loader:.ts=ts --platform=node \"--external:@babel/preset-typescript/*\" --outfile=build/out.js && env $(cat .env) node build/out.js"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.5.0",
+    "@trbn/jsoncanvas": "^1.0.6",
+    "@types/jsdom": "^21.1.6",
+    "@types/node": "^20.11.30",
+    "@types/nunjucks": "^3.2.6",
+    "@types/yargs": "^17.0.32",
+    "axios": "^1.6.8",
+    "canvas": "^2.11.2",
+    "cheerio": "^1.0.0-rc.12",
+    "chokidar": "^3.6.0",
+    "esbuild": "^0.20.2",
+    "jsdom": "^24.0.0",
+    "langchain": "^0.1.28",
+    "nunjucks": "^3.2.4",
+    "openai": "^4.29.2",
+    "photon-geocoder": "^1.0.1",
+    "playwright": "^1.42.1",
+    "remark-parse": "^11.0.0",
+    "ts-node": "^10.9.2",
+    "tsne-js": "^1.0.3",
+    "tsneez": "^0.9.3",
+    "typescript": "^5.4.3",
+    "unified": "^11.0.4",
+    "yaml": "^2.4.1",
+    "yargs": "^17.7.2",
+    "youtube-transcript": "^1.1.0",
+    "youtubei.js": "^9.1.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@swc/cli": "^0.3.10",
+    "sucrase": "^3.35.0"
+  }
+}

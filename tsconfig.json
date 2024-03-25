@@ -1,0 +1,14 @@
+{
+	/* fallback configuration for whole repo */
+	"compilerOptions": {
+		"outDir": "./nope-use-bun-instead",
+		"target": "ESNext",
+		"module": "ESNext",
+		"strict": true,
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"lib": ["ESNext", "DOM", "DOM.Iterable"],
+		"types": ["bun-types"]
+	},
+	"exclude": ["node_modules", "**/dist", "kit/local"]
+}
