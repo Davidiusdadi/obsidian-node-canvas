@@ -9,6 +9,8 @@ import path from "node:path"
 import {writeFileSync} from "node:fs"
 import {CTX, Fn} from "./node/code_to_fn"
 import z from "zod"
+import chalk from "chalk"
+import {logger} from './globals'
 
 
 type JSONCanvasNode = LinkNode | TextNode | GenericNode & {
@@ -27,10 +29,25 @@ const args = yargs(hideBin(process.argv))
     .option('canvas', {
         type: 'string',
         demandOption: true,
-    }).parseSync()
+    }).option('debug', {
+        type: 'boolean',
+        default: false
+    })
+    .parseSync()
 
 const canvas_path = args.canvas
 const vault_dir = args.vault
+
+
+if (args.debug) {
+    logger.debug = (...args: any[]) => {
+        const args_nice = args.map(a => typeof a === 'string' ? debug_color(a) : a)
+        console.debug(...args_nice)
+    }
+}
+
+
+const debug_color = chalk.magenta
 
 async function parseCanvas(): Promise<Map<string, CNode>> {
     let canvas_path_full = path.join(vault_dir, canvas_path)
@@ -57,7 +74,7 @@ async function parseCanvas(): Promise<Map<string, CNode>> {
                 const first_child = md_html.children?.[0]
 
                 if (first_child?.type === 'code') {
-                    console.log('parsing code node: ', first_child)
+                    //console.log('parsing code node: ', first_child)
                     node_value = await parseNode({
                         ...first_child,
                         id: node.id
@@ -86,7 +103,7 @@ async function parseCanvas(): Promise<Map<string, CNode>> {
         const node_with_edges = node as Extract<typeof node, { edges: any }>
         if (node_with_edges.edges !== undefined) {
             node_with_edges.edges = node_edges
-            console.log('node with edges: ', node_with_edges)
+            //console.log('node with edges: ', node_with_edges)
         }
 
         if (node.type === 'file') {
@@ -108,17 +125,20 @@ async function parseCanvas(): Promise<Map<string, CNode>> {
 (async () => {
     const node_data = await parseCanvas()
 
-    console.log('node data: ', node_data.values())
+    for (const node of node_data.values()) {
+        logger.debug('node data: ', node)
+    }
+
 
     const instr = [...node_data.values()]
-    const start = instr.find(ins => ins.type === 'start')
-    if (!start) {
-        throw new Error('no start node found')
+    const start = instr.filter(ins => ins.type === 'start')
+    if (start.length !== 1) {
+        throw new Error(`no unique start node found: found ${start.length}`)
     }
 
 
     const stack: { node: CNode, input: any }[] = [{
-        node: start,
+        node: start[0],
         input: undefined
     }]
 
@@ -152,7 +172,12 @@ async function parseCanvas(): Promise<Map<string, CNode>> {
 
         const {node, input} = frame
 
-        console.log('executing node: ', node)
+
+        const {fn, ...node_debug} = node
+        logger.debug('executing node: ', {
+            ...node_debug,
+            edges: node_debug.edges.length
+        })
 
 
         const edges_default_out = node.edges.filter((edge) => {
@@ -160,10 +185,7 @@ async function parseCanvas(): Promise<Map<string, CNode>> {
         })
 
 
-
-        if (node.type === 'start') {
-            console.log('start node')
-        } else if (node.fn) {
+         if (node.fn) {
             ctx.input = input
             ctx.emit = (label: string, emission: any) => {
                 console.log('emitting: ', label)
@@ -178,6 +200,7 @@ async function parseCanvas(): Promise<Map<string, CNode>> {
 
 
         if (node.fn) {
+            logger.debug(`following edges: ${edges_default_out.length}`)
             stack_push(edges_default_out, return_value)
         }
 

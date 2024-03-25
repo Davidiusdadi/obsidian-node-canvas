@@ -23,7 +23,7 @@ export async function ts_to_js(ts_code: string) {
         module: typescript.ModuleKind.ESNext // Keep ES module syntax for Babel to process
     });
 
-    console.log('js_code:', js)
+    //console.log('js_code:', js)
     return transformStaticImportsToDynamic(ts_code)
     // const result = await babel.transformAsync(jsCode, {
     //     plugins: ['@babel/plugin-syntax-dynamic-import'],
