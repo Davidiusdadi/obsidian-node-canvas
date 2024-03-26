@@ -42,6 +42,17 @@ The need obsidian-node-canvas arose during the hackathon as a way of bridging be
 
 After some initial [API prototyping](https://github.com/utopia-os/utopia-mesh-api) it became clear that this kind of offshoots or minor "hacks" would be of limited value.
 
+From there the question arose, how to serve all these needs of the temporary hackathon community @ Moos while creating tangible value beyond the hackathon. As already a obsidian power-user I figured that I could create "something really awesome" in no time if I'd use the already pretty obsidian canvas as a foundation. 
+
+From there I worked on:
+  - using ONC to create t-sne based visualization based on the utopia-mesh-api
+  - crawling and ingesting datasources
+  - prototyping the execution rules including
+    - execution follows arrows
+    - using named arrows (emits)
+    - logic for
+      - splitting and joining flow
+      - using file embeds
 
 ### how to run
 
