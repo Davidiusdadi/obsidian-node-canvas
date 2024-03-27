@@ -71,3 +71,8 @@ yarn dev --vault /home/david/prv/code/obsidian-node-canvas/examples --canvas pat
 
 Your OS needs to be able to run node > 20.x. Depending on you specific package dependencies you can also run https://bun.sh/ but that would bring some compatibility issues with specific  e.g. `jsdom` which you then would not be able to use in canvases. I tested only on Ubuntu 20.
 
+
+
+## Future plans & ideas
+
+https://www.unpkg.com/
