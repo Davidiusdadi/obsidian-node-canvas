@@ -185,7 +185,7 @@ async function parseCanvas(): Promise<Map<string, CNode>> {
         })
 
 
-         if (node.fn) {
+        if (node.fn) {
             ctx.input = input
             ctx.emit = (label: string, emission: any) => {
                 console.log('emitting: ', label)
@@ -199,10 +199,8 @@ async function parseCanvas(): Promise<Map<string, CNode>> {
         }
 
 
-        if (node.fn) {
-            logger.debug(`following edges: ${edges_default_out.length}`)
-            stack_push(edges_default_out, return_value)
-        }
+        logger.debug(`following edges: ${edges_default_out.length}`)
+        stack_push(edges_default_out, return_value)
 
 
     }

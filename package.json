@@ -6,10 +6,10 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "build": "esbuild runner.ts --bundle --loader:.ts=ts --platform=node \"--external:@babel/preset-typescript/*\" --outfile=build/out.js --sourcemap",
-    "dev": "yarn -s build && env $(cat .env) node build/out.js",
-    "dev:inspect": "yarn -s build && env $(cat .env) node --inspect-brk build/out.js",
-    "dev:inspect-brk": "yarn -s build && env $(cat .env) node --inspect-brk build/out.js"
+    "build": "esbuild src/main.ts --bundle --loader:.ts=ts --platform=node \"--external:@babel/preset-typescript/*\" --outfile=build/main.js --sourcemap",
+    "dev": "yarn -s build && env $(cat .env) node build/main.js",
+    "dev:inspect": "yarn -s build && env $(cat .env) node --inspect-brk build/main.js",
+    "dev:inspect-brk": "yarn -s build && env $(cat .env) node --inspect-brk build/main.js"
   },
   "dependencies": {
     "@mozilla/readability": "^0.5.0",
