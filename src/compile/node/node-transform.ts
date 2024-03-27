@@ -1,7 +1,11 @@
+/**
+ * Defines canvas node transformations via zod.
+ */
 import {z} from 'zod'
 import {Fn, js_to_fn} from "./code_to_fn"
 import {ts_to_js} from "./ts_to_js"
 import {yaml_to_fn} from "./yaml_to_fn"
+import {logger} from "../../globals"
 
 
 export interface ExecutionContext {
@@ -105,7 +109,7 @@ export const ZCodeNode = ZBaseNode.extend({
     type: z.literal('code'),
     lang: z.enum(['js', 'ts', 'yaml', 'dataview', 'dataviewjs']),
     value: z.string()
-}).strip().transform(async (v) => {
+}).strip().transform((v) => {
 
     return {
         type: 'code' as const,
@@ -135,39 +139,16 @@ export const NodeVariant = z.union([
     ZFile
 ])
 
+/// output node
+export type ONode = z.output<typeof NodeVariant>
 
-export const parseNode = async (input: any, context: ExecutionContext) => {
-    let obj = input
-    if (typeof input === 'string') {
-        try {
-            obj = JSON.parse(input)
-        } catch (e) {
-            // do nothing
-        }
+/** parse without finalizing .fn yet  - only do a pure zod transform */
+export const preParseNode = (input: z.input<typeof NodeVariant>, context: ExecutionContext) => {
+    try {
+        return  NodeVariant.parse(input)
+    } catch (e) {
+        logger.error('failed to parse node', input)
+        throw new Error('failed to parse a node')
     }
-    const node = await NodeVariant.parseAsync(obj)
-
-
-    if (node.type === 'code') {
-        let fn: Fn
-        if (node.lang === 'dataview') {
-            fn = (ctx, input) => {
-                return input
-            }
-        } else if (node.lang === 'yaml') {
-            fn = yaml_to_fn(node.code, context)
-        } else {
-            let js_code = node.code
-            if (node.lang === 'ts') {
-                js_code = await ts_to_js(node.code)
-            }
-            fn = js_to_fn(js_code)
-        }
-        node.fn = fn
-    }
-
-
-    return node
 }
 
-export type CNode = z.output<typeof NodeVariant>

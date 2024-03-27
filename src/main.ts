@@ -1,14 +1,9 @@
 import yargs from 'yargs';
 import {hideBin} from "yargs/helpers"
-
-import {CNode, ExecutionContext, parseNode, ZEdge} from "./node/types"
-
-import {CTX, Fn} from "./node/code_to_fn"
-import z from "zod"
 import chalk from "chalk"
 import {logger} from './globals'
-import {parseCanvas} from "./parse-canvas"
-import {execCanvas} from "./exec-canvas"
+import {parseCanvas} from "./compile/parse-canvas"
+import {execCanvas} from "./runtime/exec-canvas"
 
 
 
@@ -40,18 +35,21 @@ if (args.debug) {
 
 
 const debug_color = chalk.magenta;
+let stage = 'parsing';
 
-
-
-
-
+// parse canvas and run it
 (async () => {
     const node_data = await parseCanvas(canvas_path, {
         vault_dir
     })
-
+    stage = 'runtime'
     await execCanvas(node_data)
-
-})()
+})().catch((e) => {
+    console.trace(e)
+    console.log(`an error during ${chalk.red(stage)}: ${e}`)
+    process.exit(1)
+}).then(() => {
+    console.log('done 🎉')
+})
 
 

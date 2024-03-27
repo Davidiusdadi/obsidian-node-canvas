@@ -6,10 +6,10 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "build": "esbuild src/main.ts --bundle --loader:.ts=ts --platform=node \"--external:@babel/preset-typescript/*\" --outfile=build/main.js --sourcemap",
-    "dev": "yarn -s build && env $(cat .env) node build/main.js",
-    "dev:inspect": "yarn -s build && env $(cat .env) node --inspect-brk build/main.js",
-    "dev:inspect-brk": "yarn -s build && env $(cat .env) node --inspect-brk build/main.js"
+    "build": "esbuild src/main.ts --bundle --loader:.ts=ts --platform=node \"--external:@babel/preset-typescript/*\" --outfile=build/out.js --sourcemap",
+    "dev": "yarn -s build && env $(cat .env) node build/out.js",
+    "dev:inspect": "yarn -s build && env $(cat .env) node --inspect-brk build/out.js",
+    "dev:inspect-brk": "yarn -s build && env $(cat .env) node --inspect-brk build/out.js"
   },
   "dependencies": {
     "@mozilla/readability": "^0.5.0",
@@ -38,6 +38,7 @@
     "tsneez": "^0.9.3",
     "typescript": "^5.4.3",
     "unified": "^11.0.4",
+    "unist-util-visit": "^5.0.0",
     "yaml": "^2.4.1",
     "yargs": "^17.7.2",
     "youtube-transcript": "^1.1.0",

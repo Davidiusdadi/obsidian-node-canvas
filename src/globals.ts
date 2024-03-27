@@ -1,9 +1,8 @@
 
 
 export let logger = {
-    debug: (...args: any[]) => {}
+    debug: (...args: any[]) => {},
+    warn: console.warn,
+    error: console.error
 }
 
-export interface  GlobalContext {
-    vault_dir: string
-}

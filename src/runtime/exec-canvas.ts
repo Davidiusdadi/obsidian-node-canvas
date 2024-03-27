@@ -1,8 +1,9 @@
-import {CNode, ZEdge} from "./node/types"
-import {CTX} from "./node/code_to_fn"
+import {ONode, ZEdge} from "../compile/node/node-transform"
+import {CTX} from "../compile/node/code_to_fn"
 import z from "zod"
-import {logger} from "./globals"
-import {ParsedCanvas} from "./parse-canvas"
+import {logger} from "../globals"
+
+import {ParsedCanvas} from "../types"
 
 
 export async function execCanvas(node_data: ParsedCanvas) {
@@ -13,7 +14,7 @@ export async function execCanvas(node_data: ParsedCanvas) {
     }
 
 
-    const stack: { node: CNode, input: any }[] = [{
+    const stack: { node: ONode, input: any }[] = [{
         node: start[0],
         input: undefined
     }]
