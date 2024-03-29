@@ -24,6 +24,7 @@
     "cheerio": "^1.0.0-rc.12",
     "chokidar": "^3.6.0",
     "esbuild": "^0.20.2",
+    "gray-matter": "^4.0.3",
     "jsdom": "^24.0.0",
     "langchain": "^0.1.28",
     "lodash": "^4.17.21",
@@ -43,7 +44,8 @@
     "yargs": "^17.7.2",
     "youtube-transcript": "^1.1.0",
     "youtubei.js": "^9.1.0",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "obsidian-vault-parser": "git+https://github.com/Davidiusdadi/obsidian-vault-parser.git#main"
   },
   "devDependencies": {
     "@swc/cli": "^0.3.10",
