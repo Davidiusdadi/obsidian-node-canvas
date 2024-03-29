@@ -39,11 +39,14 @@ let stage = 'parsing';
 
 // parse canvas and run it
 (async () => {
+
     const node_data = await parseCanvas(canvas_path, {
         vault_dir
     })
     stage = 'runtime'
-    await execCanvas(node_data)
+    await execCanvas(node_data, {
+        vault_dir
+    })
 })().catch((e) => {
     console.trace(e)
     console.log(`an error during ${chalk.red(stage)}: ${e}`)

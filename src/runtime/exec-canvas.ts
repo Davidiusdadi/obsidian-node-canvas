@@ -1,12 +1,13 @@
 import {ONode, ZEdge} from "../compile/node/node-transform"
 import {CTX} from "../compile/node/code_to_fn"
-import z from "zod"
+import z, {object} from "zod"
+import _ from "lodash"
 import {logger} from "../globals"
 
-import {ParsedCanvas} from "../types"
+import {GlobalContext, ParsedCanvas} from "../types"
 
 
-export async function execCanvas(node_data: ParsedCanvas) {
+export async function execCanvas(node_data: ParsedCanvas, context: GlobalContext) {
     const instr = [...node_data.values()]
     const start = instr.filter(ins => ins.type === 'start')
     if (start.length !== 1) {
@@ -14,14 +15,19 @@ export async function execCanvas(node_data: ParsedCanvas) {
     }
 
 
-    const stack: { node: ONode, input: any }[] = [{
+    const stack: { node: ONode, input: any,  state: object }[] = [{
         node: start[0],
-        input: undefined
+        input: undefined,
+        state: {}
     }]
+
+    const node_this_data = new Map<string, object>()
 
     const ctx: CTX = {
         emit: () => undefined,
-        input: undefined
+        input: undefined,
+        state: object,
+        vault_dir: context.vault_dir
     }
 
     const stack_push = (edges: z.output<typeof ZEdge>[], value: any, back = false) => {
@@ -29,7 +35,8 @@ export async function execCanvas(node_data: ParsedCanvas) {
             const node = node_data.get(e.to)!
             return {
                 node: node,
-                input: value
+                input: value,
+                state: _.cloneDeep(ctx.state)
             }
         })
         if (back) {
@@ -47,7 +54,7 @@ export async function execCanvas(node_data: ParsedCanvas) {
             break
         }
 
-        const {node, input} = frame
+        const {node, input, state} = frame
 
 
         const {fn, ...node_debug} = node
@@ -63,16 +70,20 @@ export async function execCanvas(node_data: ParsedCanvas) {
 
 
         if (node.fn) {
+            ctx.state = state
             ctx.input = input
             ctx.emit = (label: string, emission: any) => {
-                console.log('emitting: ', label)
+                console.log('emitting: ', label, emission)
                 const edges_label_out = node.edges.filter((edge) => {
                     return edge.direction === 'forward' && edge.from === node.id && edge.label?.trim() === label
                 })
 
                 stack_push(edges_label_out, emission)
             }
-            return_value = await node.fn(ctx, input)
+            const this_data = node_this_data.get(node.id) ?? {}
+            node_this_data.set(node.id,this_data)
+            return_value = await node.fn.call(this_data, ctx, input)
+
         }
 
 

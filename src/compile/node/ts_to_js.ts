@@ -5,7 +5,9 @@ const tsCode = `import { something } from 'some-module';`;
 
 function transformStaticImportsToDynamic(code: string) {
     const importRegex = /import\s+(.*?)\s+from\s+['"](.+?)['"]/g;
-    return code.replace(importRegex, (match, imports, source) => {
+    return code
+        .replace(/\s+\*\s+as\s+/g, ' ')
+        .replace(importRegex, (match, imports, source) => {
         // Assuming 'default' import for simplicity; adjust based on your needs
         let unpack = ''
         if(imports.match(/\{.*\}/) === null) {
