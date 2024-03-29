@@ -6,10 +6,10 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "build": "esbuild src/main.ts --bundle --loader:.ts=ts --platform=node \"--external:@babel/preset-typescript/*\" --outfile=build/out.js --sourcemap",
-    "dev": "yarn -s build && env $(cat .env) node build/out.js",
-    "dev:inspect": "yarn -s build && env $(cat .env) node --inspect-brk build/out.js",
-    "dev:inspect-brk": "yarn -s build && env $(cat .env) node --inspect-brk build/out.js"
+    "build": "esbuild src/main.ts --bundle --loader:.ts=ts --platform=node \"--external:@babel/preset-typescript/*\" --outfile=build/main.js --sourcemap",
+    "dev": "yarn -s build && env $(cat .env) node build/main.js",
+    "dev:inspect": "yarn -s build && env $(cat .env) node --inspect-brk build/main.js",
+    "dev:inspect-brk": "yarn -s build && env $(cat .env) node --inspect-brk build/main.js"
   },
   "dependencies": {
     "@mozilla/readability": "^0.5.0",
@@ -24,15 +24,13 @@
     "cheerio": "^1.0.0-rc.12",
     "chokidar": "^3.6.0",
     "esbuild": "^0.20.2",
-    "glob": "^10.3.10",
-    "gray-matter": "^4.0.3",
     "jsdom": "^24.0.0",
     "langchain": "^0.1.28",
     "lodash": "^4.17.21",
     "nunjucks": "^3.2.4",
-    "obsidian-vault-parser": "^0.4.1",
     "openai": "^4.29.2",
     "photon-geocoder": "^1.0.1",
+    "playwright": "^1.42.1",
     "puppeteer": "^22.6.1",
     "remark-parse": "^11.0.0",
     "ts-node": "^10.9.2",
@@ -40,7 +38,6 @@
     "tsneez": "^0.9.3",
     "typescript": "^5.4.3",
     "unified": "^11.0.4",
-    "unist-util-visit": "^5.0.0",
     "yaml": "^2.4.1",
     "yargs": "^17.7.2",
     "youtube-transcript": "^1.1.0",
@@ -49,7 +46,6 @@
   },
   "devDependencies": {
     "@swc/cli": "^0.3.10",
-    "@types/lodash": "^4.17.0",
     "sucrase": "^3.35.0"
   }
 }

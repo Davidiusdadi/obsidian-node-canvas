@@ -6,7 +6,7 @@ import {readFile} from "fs/promises"
 import {GenericNode, GroupNode, JSONCanvas, LinkNode, TextNode} from '@trbn/jsoncanvas'
 import {Fn, js_to_fn} from "./node/code_to_fn"
 import {GlobalContext, ParsedCanvas} from "../types"
-import {visit} from 'unist-util-visit'
+///import {visit} from 'unist-util-visit'
 import {yaml_to_fn} from "./node/yaml_to_fn"
 import {ts_to_js} from "./node/ts_to_js"
 import {logger} from "../globals"
@@ -50,8 +50,19 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
             if (cnode.type === 'text') { // obsidian will treat all text as markdown
                 const md_html = parseMd(cnode.text)
 
+                const  md_node = md_html.children[0]
+
+                if (!onode && md_node.type === 'code') {
+                    //console.log('parsing code node: ', first_child)
+                    onode = preParseNode({
+                            ...md_node,
+                            id: cnode.id
+                        } as any // zod ensures a strict validation or will throw
+                        , context)
+                }
+
                 // grab the first code block
-                visit(md_html, 'code', (md_node, index, parent) => {
+             /*   visit(md_html, 'code', (md_node, index, parent) => {
                     if (!onode && md_node.type === 'code') {
                         //console.log('parsing code node: ', first_child)
                         onode = preParseNode({
@@ -60,7 +71,7 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
                             } as any // zod ensures a strict validation or will throw
                             , context)
                     }
-                })
+                })*/
 
 
             }
