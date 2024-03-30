@@ -1,20 +1,6 @@
-import chalk from "chalk"
-import {OEdge, ONode} from "./node-transform"
 import _ from "lodash"
-
-export class InputsNotFullfilled extends Error {
-    /**
-     * whether node enters aggregating state
-     **/
-
-    constructor(public is_aggregating: boolean) {
-        super()
-    }
-}
-
-export class BadCanvasInstruction extends Error {
-
-}
+import {CTX, StackFrame} from "./runtime-types"
+import {BadCanvasInstruction, InputsNotFullfilled} from "./errors"
 
 
 interface JoinerState {
@@ -140,55 +126,4 @@ export class InputsFilterJoiner {
 
 }
 
-export type CTX = {
-    emit: (label: string, value: any) => void
-    input: any
-    vault_dir: string
-    _this: FnThis
-    state: any,
-    onode: ONode
-    onodes: ONode[]
-} & Record<string, any>
 
-
-export interface StackFrame {
-    node: ONode,
-    input: any,
-    state: any,
-    edge: null | OEdge
-    is_aggregating: boolean
-}
-
-export type FnThis = {
-    _invocations: Record<string, StackFrame[]>
-    // join it will always be set during node execution
-    join?: InputsFilterJoiner
-}
-
-export type Fn = (this: FnThis, ctx: CTX, input: any) => any
-
-
-export function js_to_fn(code: string): Fn {
-    const instr_code = `
-return (async () => {
-let state = ctx.state;
-const inputs = ctx.inputs;
-
-const emit = (...args) => {
-    ctx.state = state;
-    return ctx.emit(...args);
-};
-// provide easy to sleep function
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-${code}
-
-ctx.state = state;
-})()
-`
-    try {
-        const fn = new Function('ctx', 'input', instr_code) as Fn
-        return fn
-    } catch (e) {
-        throw new Error(`Failed to compile code: ${chalk.blue(instr_code)}\n${e}`)
-    }
-}

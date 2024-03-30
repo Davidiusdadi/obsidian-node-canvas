@@ -1,15 +1,17 @@
-import {parseMd} from "./md-parse"
 import path from "node:path"
 import {writeFileSync} from "node:fs"
-import {ExecutionContext, ONode, preParseNode, ZEdge} from "./node/node-transform"
+import {ExecutionContext, ONode, preParseNode} from "./canvas-node-transform"
 import {readFile} from "fs/promises"
 import {GenericNode, GroupNode, JSONCanvas, LinkNode, TextNode} from '@trbn/jsoncanvas'
-import {Fn, js_to_fn} from "./node/code_to_fn"
 import {GlobalContext, ParsedCanvas} from "../types"
 import {visit} from 'unist-util-visit'
-import {yaml_to_fn} from "./node/yaml_to_fn"
-import {ts_to_js} from "./node/ts_to_js"
+
 import {logger} from "../globals"
+import {ZEdge} from "./canvas-edge-transform"
+import {Fn} from "../runtime/runtime-types"
+import {js_to_fn} from "../runtime/js-block-to-fn"
+import {parseMd} from "./md-parse"
+import {code_node_compilers} from "./node"
 
 /** @trbn/jsoncanvas types are not complete - these are:  */
 type JSONCanvasNode = LinkNode | TextNode | GenericNode & {
@@ -68,21 +70,17 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
 
 
         if (onode?.type === 'code') {
-            let fn: Fn
-            if (onode.lang === 'dataview') {
-                fn = (ctx, input) => {
-                    return input
+
+
+            for(const comp of code_node_compilers) {
+                if(comp.lang === onode.lang) {
+                    onode.fn =  await comp.compile(onode.code, context)
+                    break
                 }
-            } else if (onode.lang === 'yaml') {
-                fn = yaml_to_fn(onode.code, context)
-            } else {
-                let js_code = onode.code
-                if (onode.lang === 'ts') {
-                    js_code = await ts_to_js(onode.code)
-                }
-                fn = js_to_fn(js_code)
             }
-            onode.fn = fn
+            if (!onode.fn) {
+                logger.error(`no compiler found for ${onode.lang} node:`, onode.code)
+            }
         }
 
         if (!onode) {
@@ -116,8 +114,6 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
 
         if (node.type === 'file') {
             node.fn = ((ctx, input) => {
-
-
                 const content = typeof input === 'object' ? JSON.stringify(input, null, 2) : input
                 const target_path = path.join(config.vault_dir, node.file)
                 console.log('writing file: ', target_path, content)

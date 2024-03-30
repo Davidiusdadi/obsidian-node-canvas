@@ -1,13 +1,19 @@
-import {ONode, ZEdge} from "../compile/node/node-transform"
-import {CTX, FnThis, InputsFilterJoiner, InputsNotFullfilled, StackFrame} from "../compile/node/code_to_fn"
+import {ONode} from "../compile/canvas-node-transform"
+import {InputsFilterJoiner} from "./code_to_fn"
 import z, {object} from "zod"
 import _ from "lodash"
 import {logger} from "../globals"
 
 import {GlobalContext, ParsedCanvas} from "../types"
 import chalk from "chalk"
+import {ZEdge} from "../compile/canvas-edge-transform"
+import {CTX, FnThis, StackFrame} from "./runtime-types"
+import {InputsNotFullfilled} from "./errors"
 
-
+/**
+ * This holds the main execution loop.
+ * It receives fully parsed and configured nodes ready for execution.
+ **/
 export async function execCanvas(node_data: ParsedCanvas, context: GlobalContext) {
     const instr = [...node_data.values()]
     const start = instr.filter(ins => ins.type === 'start')

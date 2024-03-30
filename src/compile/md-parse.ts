@@ -1,7 +1,7 @@
 import {unified} from "unified"
 import remarkParse from "remark-parse"
 
-let processor_md = unified()
+export let processor_md = unified()
     .use(remarkParse, {gfm: true})
 
 /** @returns ast */

@@ -1,4 +1,4 @@
-import {ONode} from "./compile/node/node-transform"
+import {ONode} from "./compile/canvas-node-transform"
 
 /** Parsed / Compiled canvas - ready for execution */
 export type ParsedCanvas = Map<string, ONode>

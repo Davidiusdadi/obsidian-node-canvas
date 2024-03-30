@@ -1,12 +1,15 @@
 import yaml from "yaml"
 import nunjucks from "nunjucks"
-import {CTX, Fn} from "./code_to_fn"
 import z from "zod"
 import OpenAI from "openai"
-import {ExecutionContext} from "./node-transform"
+import {ExecutionContext} from "../canvas-node-transform"
 import {writeFileSync} from "node:fs"
 import path from "path"
 import {mkdirSync} from "fs"
+import {CTX, Fn} from "../../runtime/runtime-types"
+import {js_to_fn} from "../../runtime/js-block-to-fn"
+import {NodeCompiler} from "./template"
+import {ts_to_js} from "./node-ts"
 
 
 nunjucks.configure({autoescape: false})
@@ -104,3 +107,10 @@ function transformObjectStrings(obj: any, transformString: (v: string) => any): 
     }
     return obj;
 }
+
+export default {
+    lang: 'yaml',
+    compile: async (code, context) => {
+        return yaml_to_fn(code, context)
+    }
+} satisfies NodeCompiler
