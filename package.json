@@ -12,6 +12,7 @@
     "dev:inspect-brk": "yarn -s build && env $(cat .env) node --inspect-brk build/main.js"
   },
   "dependencies": {
+    "@directus/sdk": "^15.0.3",
     "@mozilla/readability": "^0.5.0",
     "@trbn/jsoncanvas": "^1.0.6",
     "@types/jsdom": "^21.1.6",
@@ -29,6 +30,7 @@
     "langchain": "^0.1.28",
     "lodash": "^4.17.21",
     "nunjucks": "^3.2.4",
+    "obsidian-vault-parser": "git+https://github.com/Davidiusdadi/obsidian-vault-parser.git#main",
     "openai": "^4.29.2",
     "photon-geocoder": "^1.0.1",
     "playwright": "^1.42.1",
@@ -44,11 +46,11 @@
     "yargs": "^17.7.2",
     "youtube-transcript": "^1.1.0",
     "youtubei.js": "^9.1.0",
-    "zod": "^3.22.4",
-    "obsidian-vault-parser": "git+https://github.com/Davidiusdadi/obsidian-vault-parser.git#main"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@swc/cli": "^0.3.10",
+    "@types/lodash": "^4.17.0",
     "sucrase": "^3.35.0"
   }
 }

@@ -45,6 +45,9 @@ export const ZEdge = z.object({
     }
 })
 
+
+export type OEdge = z.output<typeof ZEdge>
+
 export const ZBaseNode = z.object({
     id: z.string(),
     edges: z.array(ZEdge).default([]),
@@ -147,7 +150,6 @@ export const preParseNode = (input: z.input<typeof NodeVariant>, context: Execut
     try {
         return  NodeVariant.parse(input)
     } catch (e) {
-        logger.error('failed to parse node', input)
         throw new Error('failed to parse a node')
     }
 }

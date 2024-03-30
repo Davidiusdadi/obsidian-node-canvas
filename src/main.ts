@@ -49,7 +49,7 @@ let stage = 'parsing';
     })
 })().catch((e) => {
     console.trace(e)
-    console.log(`an error during ${chalk.red(stage)}: ${e}`)
+    console.log(`Error during ${chalk.red(stage)}: ${e}`)
     process.exit(1)
 }).then(() => {
     console.log('done 🎉')
