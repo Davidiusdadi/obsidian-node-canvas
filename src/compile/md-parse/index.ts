@@ -8,5 +8,3 @@ let processor_md = unified()
 export function parseMd(content: string) {
     return processor_md.parse(content)
 }
-
-export type MDAstNode = ReturnType<typeof parseMd>

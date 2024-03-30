@@ -86,7 +86,7 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
         }
 
         if (!onode) {
-            logger.warn('ignoring node:', cnode)
+            logger.debug('ignoring node:', cnode)
             onode = {
                 id: cnode.id,
                 fn: (ctx, input) => input,

@@ -3,63 +3,136 @@ import {OEdge, ONode} from "./node-transform"
 import _ from "lodash"
 
 export class InputsNotFullfilled extends Error {
+    /**
+     * whether node enters aggregating state
+     **/
+
+    constructor(public is_aggregating: boolean) {
+        super()
+    }
+}
+
+export class BadCanvasInstruction extends Error {
 
 }
 
+
+interface JoinerState {
+    ctx: CTX
+    frame: StackFrame
+    inputs: Record<string, StackFrame[]>
+    _inner_join: boolean
+    get_field?: 'state' | 'input'
+}
+
 export class InputsFilterJoiner {
-
-    private _all = true;
-    private edge_ids: string[] = []
+    private ctx: CTX
+    private frame: StackFrame
     private inputs: Record<string, StackFrame[]>
+    private edge_ids: string[] = []
+    private _inner_join = false
+    private get_field?: 'state' | 'input'
+
+    private getState() {
+        return {
+            ctx: this.ctx,
+            frame: this.frame,
+            inputs: this.inputs,
+            _inner_join: this._inner_join,
+            get_field: this.get_field
+        } satisfies JoinerState
+    }
 
 
-    constructor(private ctx: CTX) {
-        this.inputs = _.clone(this.ctx._this._invocations)
+    static create(ctx: CTX, frame: StackFrame) {
+        const inputs = _.clone(ctx._this._invocations)
+        return new InputsFilterJoiner({
+            ctx,
+            frame,
+            inputs,
+            get_field: 'input',
+            _inner_join: false
+        })
+    }
+
+    protected constructor(state: JoinerState) {
+        this.ctx = state.ctx
+        this.frame = state.frame
+        this.inputs = state.inputs
+        this._inner_join = state._inner_join
+        this.get_field = state.get_field
         this.edge_ids = Object.keys(this.inputs)
+    }
 
+    get aggregate() {
+        if (this._inner_join) {
+            throw new BadCanvasInstruction(`You can't use join via .inner and .aggregate at the same time.`)
+        }
+        if (this.frame.is_aggregating) {
+            return this // aggregating is not fullfilled
+        } else {
+            throw new InputsNotFullfilled(true)
+        }
     }
 
     get inner() {
-        this._all = true
+        if (this.frame.is_aggregating) {
+            throw new BadCanvasInstruction(`You can't use join via .inner and .aggregate at the same time.`)
+        }
+        this._inner_join = true
         this.check()
         return this
     }
 
-    state(field: string) {
-        const state = this.ctx.state
-        for (const edge_id of this.edge_ids) {
-            this.inputs[edge_id] = this.inputs[edge_id].filter((invocation) => {
-                return invocation.state[field] === state[field]
-            })
+
+    protected filter(field: 'state' | 'input', value: any) {
+        let inputs = _.clone(this.inputs)
+        if (value !== undefined) {
+            for (const edge_id of this.edge_ids) {
+                inputs[edge_id] = inputs[edge_id].filter((invocation) => {
+                    return invocation[field] === value
+                })
+            }
+            this.check()
         }
-        this.check()
-        return _.merge(
+        return new InputsFilterJoiner({
+            ...this.getState(),
+            inputs,
+            get_field: field
+        })
+    }
+
+    state(field?: string) {
+        return this.filter('state', field)
+    }
+
+    private get invocations_by_field() {
+        if (!this.get_field) {
+            throw new BadCanvasInstruction(`You can't use .merge without calling .state('<field>') or .state('<input>') . first`)
+        }
+        return _.flatten(
             Object.values(this.inputs)
-                .map((invocations) => invocations.map((invocation) => invocation.state))
+                .map((invocations) => invocations.map((invocation) => invocation[this.get_field!]))
         )
     }
 
-    input(field: string) {
-        const input = this.ctx.input
+    merge() {
+        return _.merge({}, this.invocations_by_field)
+    }
 
-        for (const edge_id of this.edge_ids) {
-            this.inputs[edge_id] = this.inputs[edge_id].filter((invocation) => {
-                return invocation.input[field] === input[field]
-            })
-        }
-        this.check()
+    list() {
+        return this.invocations_by_field
+    }
 
-        const all = _.flatten(
-            Object.values(this.inputs).map((invocations) => invocations.map((invocation) => invocation.input))
-        )
-        return _.merge({}, ...all)
+    input(field?: string) {
+        return this.filter('input', field)
     }
 
     private check() {
         Object.entries(this.inputs).forEach(([key, invocations]) => {
-            if (this._all && invocations.length === 0) {
+            if (this._inner_join && invocations.length === 0) {
                 // one edge is still not fullfilled
-                throw new InputsNotFullfilled()
+                throw new InputsNotFullfilled(false)
             }
         })
     }
@@ -72,15 +145,24 @@ export type CTX = {
     input: any
     vault_dir: string
     _this: FnThis
-    state: any
+    state: any,
+    onode: ONode
+    onodes: ONode[]
 } & Record<string, any>
 
 
-export type StackFrame = { node: ONode, input: any, state: any, edge: null | OEdge }
+export interface StackFrame {
+    node: ONode,
+    input: any,
+    state: any,
+    edge: null | OEdge
+    is_aggregating: boolean
+}
 
 export type FnThis = {
     _invocations: Record<string, StackFrame[]>
-    join: InputsFilterJoiner
+    // join it will always be set during node execution
+    join?: InputsFilterJoiner
 }
 
 export type Fn = (this: FnThis, ctx: CTX, input: any) => any
