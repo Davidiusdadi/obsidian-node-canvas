@@ -1,0 +1,18 @@
+{
+	"nodes":[
+		{"id":"2a741d012892e0fc","type":"text","text":"start","x":-960,"y":-669,"width":99,"height":53},
+		{"id":"42ddbf62e485a729","type":"text","text":"```ts\nimport axios from \"axios\"\n\n//const url = \"https://lionfish-app-a8os7.ondigitalocean.app/places\"\n//const url = \"http://localhost:3000/places?vector=1\"\nconst url = \"https://lionfish-app-a8os7.ondigitalocean.app/places?vector=1\"\nconst {data}= await axios.get(url)\n\nctx.data = data\nctx.embeddings =  data.map(e => e.vector.embedding)\n```\n","x":-760,"y":-772,"width":740,"height":312},
+		{"id":"78c2f9b23025b998","type":"text","text":"```ts\nimport TSNE from 'tsne-js';\n\nlet model = new TSNE({\n  dim: 2,\n  perplexity: 30.0,\n  earlyExaggeration: 4.0,\n  learningRate: 100.0,\n  nIter: 1000,\n  metric: 'euclidean'\n\n});\n\n\nconsole.log('ctx.embeddings', ctx.embeddings)\n\n\nmodel.init({\n  data: ctx.embeddings,\n  type: 'dense'\n\n});\n\nlet [error, iter] = model.run();\nlet output = model.getOutput();\nlet outputScaled = model.getOutputScaled();\nconsole.log('outputScaled', outputScaled, ctx.embeddings.length)\nreturn outputScaled\n\n\n```","x":-820,"y":-360,"width":840,"height":700},
+		{"id":"851fa12e4aece083","type":"text","text":"```ts\nlet svgWidth = 300 // Adjust as needed\nlet svgHeight = 300; // Adjust as needed\nlet circleRadius = 5; // Adjust the radius of the circles as needed\n\nlet svgContent = `<svg width=\"${svgWidth}\" height=\"${svgHeight}\" viewBox=\"-220 -220  440 440\" xmlns=\"http://www.w3.org/2000/svg\">`;\n\nfor (let i = 0; i < input.length; i++) {\n  const x = input[i][0] * 200  ;\n  const y = input[i][1] * 200; \n  \n  const label = ctx.data[i].name.replace(/[^a-zA-Z0-9_]/g, '').trim() || '_';\n  \n  // Add circle\n  svgContent += `<circle cx=\"${x}\" cy=\"${y}\" r=\"${circleRadius}\" fill=\"blue\" />`; // You can change the fill color\n  \n  // Add text label\n  svgContent += `<text x=\"${x + circleRadius + 5}\" y=\"${y + 5}\" font-family=\"Arial\" font-size=\"9\" fill=\"black\">${label}</text>`;\n}\n\nsvgContent += `</svg>`;\n\n\nreturn svgContent\n```","x":-1004,"y":400,"width":1208,"height":580},
+		{"id":"4f925081fe9cdad4","type":"file","file":"hackathon/map-word-vector-t-sne/tsne.svg","x":-780,"y":1160,"width":686,"height":686},
+		{"id":"aed664be937938ce","x":-1129,"y":1413,"width":250,"height":180,"color":"5","type":"text","text":"this file is actually being written when the canvas is executed"},
+		{"id":"2807d4f12e1fc2cd","type":"text","text":"this canvas is maybe a bit boring because it was actually the very first one completed.\n\nfancy *routing* was or `state`-forwarding was supported yet","x":-1129,"y":-540,"width":268,"height":250,"color":"5"}
+	],
+	"edges":[
+		{"id":"4372a56a48720bca","fromNode":"2a741d012892e0fc","fromSide":"right","toNode":"42ddbf62e485a729","toSide":"left"},
+		{"id":"aebbee2794c46a78","fromNode":"42ddbf62e485a729","fromSide":"bottom","toNode":"78c2f9b23025b998","toSide":"top"},
+		{"id":"1c79a7dc80f5091e","fromNode":"78c2f9b23025b998","fromSide":"bottom","toNode":"851fa12e4aece083","toSide":"top"},
+		{"id":"b90f2f40b0c4bd3b","fromNode":"851fa12e4aece083","fromSide":"bottom","toNode":"4f925081fe9cdad4","toSide":"top"},
+		{"id":"a80ade88cb7a241c","fromNode":"aed664be937938ce","fromSide":"right","toNode":"4f925081fe9cdad4","toSide":"left"}
+	]
+}
