@@ -1,0 +1,18 @@
+{
+	"nodes":[
+		{"id":"b8a08d957800f8ff","type":"group","x":-560,"y":280,"width":901,"height":260,"label":"ssh: example.server.com"},
+		{"id":"d58eef59b3d7f876","type":"text","text":"","x":240,"y":190,"width":60,"height":50},
+		{"id":"53dcc0602bddb319","type":"text","text":"this **fictional** obsidian-node-canvas shows:\n- a LLM based  [Read–eval–print loop](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop)\n\t- involving tool use\n- `base`-code remote-execution on a remote server\n\n","x":-560,"y":-190,"width":380,"height":190,"color":"6"},
+		{"id":"5bcb603dfb8be94d","type":"text","text":"shell node:\n```bash\n$input\n```\n\nit executes the given input","x":-310,"y":320,"width":260,"height":200},
+		{"id":"c3c0b7d9be1b0e12","type":"text","text":"**agent**: `llama2-7b` \n- tools: `run-shell`\n- exit: `result`\n\n---\n\n> find out which OS is installed here","x":-135,"y":-140,"width":355,"height":280},
+		{"id":"ade0528f51403be5","type":"text","text":"start","x":-310,"y":80,"width":125,"height":60,"color":"1"},
+		{"id":"1c9f88df23b6c251","type":"text","text":"- **print**\n- **return**","x":270,"y":-270,"width":190,"height":80}
+	],
+	"edges":[
+		{"id":"a291d8289845041a","fromNode":"c3c0b7d9be1b0e12","fromSide":"bottom","toNode":"5bcb603dfb8be94d","toSide":"top","label":"run-shell"},
+		{"id":"826fef5a01350120","fromNode":"5bcb603dfb8be94d","fromSide":"right","toNode":"d58eef59b3d7f876","toSide":"bottom","label":"|"},
+		{"id":"98d92567099c8745","fromNode":"d58eef59b3d7f876","fromSide":"top","toNode":"c3c0b7d9be1b0e12","toSide":"right"},
+		{"id":"26dc2c0bfa5b6c37","fromNode":"c3c0b7d9be1b0e12","fromSide":"top","toNode":"1c9f88df23b6c251","toSide":"left","label":"result"},
+		{"id":"993f5f04356ca394","fromNode":"ade0528f51403be5","fromSide":"right","toNode":"c3c0b7d9be1b0e12","toSide":"left"}
+	]
+}

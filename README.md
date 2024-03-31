@@ -1,6 +1,8 @@
 # obsidian-node-canvas
 
-**Warning**: WIP - prototyping not yet completed
+**Warning**: this is a working prototype - run at you own risk
+
+![](https://github.com/Davidiusdadi/obsidian-node-canvas/blob/master/examples/tutorial/tutorial.png)
 
 **Obsidan-Node-Canvas** is a `javascript`-based workflow/scripting engine build on top of [obsidian](https://obsidian.md/)  (the popular and powerful journaling, knowledge bases, and project management tool ).
 
@@ -135,7 +137,8 @@ Details coming soon **but** it's a normal node app that you need to run and poin
 example invocation: 
 ```bash
 yarn install
-yarn dev --vault /home/david/prv/code/obsidian-node-canvas/examples --canvas path/mycanvas.canvas --debug
+yarn dev --vault examples --canvas tutorial/tutorial.canvas  
+
 
 ```
 

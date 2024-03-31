@@ -1,0 +1,16 @@
+{
+	"nodes":[
+		{"id":"99274419cbb99038","type":"file","file":"hackathon/mockup/webserver-concept.canvas","x":-180,"y":-500,"width":400,"height":400},
+		{"id":"8be1a90e00faed6c","type":"file","file":"hackathon/mockup/llm-danger-ssh-concept.canvas","x":500,"y":-220,"width":400,"height":400},
+		{"id":"7afca6c627f30766","x":20,"y":56,"width":280,"height":124,"type":"text","text":"```ts\nreturn {\n   response: input\n}\n```"},
+		{"id":"8d8b52e42501688a","x":-200,"y":93,"width":172,"height":50,"type":"text","text":"**portal-return**"},
+		{"id":"302b502a5ae81bab","type":"text","text":"start","x":-551,"y":-330,"width":109,"height":60,"color":"1"},
+		{"id":"8c3375a4e778b8d2","type":"text","text":"this **fictional** obsidian-node-canvas shows:\n- launch web-server via another canvas\n- fulfilling a task through yet another canvas\n- feeding the request back to the webserver canvas\n\nThe idea is that nodes can have portal nodes where external flow can be weaved in.","x":-739,"y":-164,"width":486,"height":220,"color":"6"}
+	],
+	"edges":[
+		{"id":"82f649e87c3d0acc","fromNode":"302b502a5ae81bab","fromSide":"right","toNode":"99274419cbb99038","toSide":"left"},
+		{"id":"e4ca645cbe3892db","fromNode":"99274419cbb99038","fromSide":"right","toNode":"8be1a90e00faed6c","toSide":"top","label":"resolve-external"},
+		{"id":"bca2315972237830","fromNode":"8be1a90e00faed6c","fromSide":"left","toNode":"7afca6c627f30766","toSide":"right","label":"return"},
+		{"id":"3d9514bdc4b6028f","fromNode":"7afca6c627f30766","fromSide":"left","toNode":"8d8b52e42501688a","toSide":"right"}
+	]
+}
