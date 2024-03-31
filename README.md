@@ -76,7 +76,7 @@ In addition, you can:
     - those canvases were created/used during the hackathon 
     - they exemplify the full power of what is possible with the prototype
 
-    
+![](images/tutorial.png)
 
 
 ## Pictures
@@ -154,26 +154,50 @@ OS support:
 
 ## plans
 
-### immediate plans
+features and improvements in no particular order:
 
-**improve**:
-
-- available yaml-based commands 
-  - make GPT conversations even easier
+- slightly rework special scope variables (aka stabelize api)
+  - `ctx`, `state`, `this`
 - documentation
-  - make a youtube tutorial
-- error output
+    - make a youtube tutorial
+- node mechanics
+  - allow writing directly to file via `|` and `>` edge-labls
+  - allows `md`-files _referencing_ for **resuable nodes** 
+  - allow _referencing_ entire `.canvas` files 
+  - add custom join / aggregation nodes
+  - allow aggregation in presence of circular flow constellation 
+    - via aggregation-start node...
   - detect not supported configurations
     - like aggregation-nodes combined with circular nodes dependencies
-- improve logging and debugging options
-  - add `--silent` option
-- slightly normalize workflow scope variables
-  - `ctx`, `state`, `this` 
-
-### bigger plans
-
-- publish via npm so that `npx` works
-- evaluate [deno](https://deno.com/) an [bun](bun.sh) support
-- https://www.unpkg.com/ or [deno](https://deno.com/) to allow better 
-- consider `--unpkg` feature so that inports no not require an `npm install` - via https://www.unpkg.com/
-- 
+- add new **special purpose nodes**
+  - **LLM** nodes
+    - LLM-Tool use node
+    - LLM conversational steps
+    - allow multi agent interaction
+    - **providers**
+      - **local** ollama
+      - mistral 
+      - openai
+      - dall-E
+  - special web-crawl nodes (via puppeteer)
+    - extract selector
+    - load page node
+    - page interaction node
+    - firefox reading view node
+  - obsidian specific nodes
+    - allow to use dataview / dataviewjs blocks as input
+    - allow intuitive updating of markdown
+- web technology
+  - add http endpoint node
+  - support jsx / tsx code blocks
+  - allow web-based **visual** introspection `--debug-server`
+    - allow node by node stepping
+    - allow to inspect internal node state
+- publish 
+  - as obsidian plugin
+  - via npm so that `npx` works
+  - allow a library build-target so that a `.chart` can consumed .e.g. as esmodule
+- code loading
+  - evaluate option to dynamically load via `--unpkg` from https://www.unpkg.com 
+  - evaluate [deno](https://deno.com/)
+  - document [bun](bun.sh) usage
