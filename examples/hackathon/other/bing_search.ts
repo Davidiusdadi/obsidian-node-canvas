@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Define your Bing Search API key and endpoint
-const bingSearchApiKey: string = 'c6fb7e34e7c34facb7c607fec4e38f9b';
+const bingSearchApiKey: string = process.env.BING_SEARCH_API_KEY!;
 const bingSearchEndpoint: string = 'https://api.bing.microsoft.com/v7.0/search';
 
 // docs: https://learn.microsoft.com/en-us/bing/search-apis/bing-web-search/reference/endpoints
