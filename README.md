@@ -76,7 +76,7 @@ In addition, you can:
     - those canvases were created/used during the hackathon 
     - they exemplify the full power of what is possible with the prototype
 
-![](images/tutorial.png)
+![](examples/tutorial/tutorial.png)
 
 
 ## Pictures
