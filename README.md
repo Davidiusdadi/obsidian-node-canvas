@@ -4,6 +4,9 @@ This is what this is about:
 
 ![](./examples/tutorial/tutorial.png)
 
+
+> To be sure to only see what was created during the hackaton see [branch: during-hackathon](https://github.com/Davidiusdadi/obsidian-node-canvas/tree/during-hackathon). Right now  [master](https://github.com/Davidiusdadi/obsidian-node-canvas/tree/master)-branch and [during-hackathon](https://github.com/Davidiusdadi/obsidian-node-canvas/tree/during-hackathon)-branch should be almost identical.
+
 **Obsidan-Node-Canvas** is a `javascript`-based workflow/scripting engine build on top of [obsidian](https://obsidian.md/)  (the popular and powerful journaling, knowledge bases, and project management tool ) - and specifically https://obsidian.md/canvas.
 
 Using Obsidan-Node-Canvas requires at least basic understanding `javascript`-programming. 
