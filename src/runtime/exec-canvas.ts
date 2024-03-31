@@ -108,7 +108,8 @@ export async function execCanvas(node_data: ParsedCanvas, context: GlobalContext
         } else {
             // otherwise run non-aggregations aka normal emissions
             const non_aggregations = stack.filter((frame) => !frame.is_aggregating)
-            frame = stack.shift()
+            frame = non_aggregations[0]
+            stack.splice(stack.indexOf(frame), 1)
         }
 
         if (!frame && all_aggregations.length > 0) {
@@ -181,10 +182,6 @@ export async function execCanvas(node_data: ParsedCanvas, context: GlobalContext
 /** collects and returns ancestor_node_ids */
 function collect_ancestor(all_nodes: ONode[], node: ONode, ancestor_node_ids: Set<string> = new Set<string>()) {
 
-    if (ancestor_node_ids.has(node.id)) {
-        return ancestor_node_ids
-    }
-
     const edges_in = node.edges
         .filter((edge) => {
             return edge.direction === 'forward' && edge.to === node.id
@@ -193,10 +190,10 @@ function collect_ancestor(all_nodes: ONode[], node: ONode, ancestor_node_ids: Se
     const parents = all_nodes.filter(n => edges_in.includes(n.id))
 
     for (const parent of parents) {
+        if (ancestor_node_ids.has(parent.id)) {
+            continue
+        }
         ancestor_node_ids.add(parent.id)
-    }
-
-    for (const parent of parents) {
         collect_ancestor(all_nodes, parent, ancestor_node_ids)
     }
 

@@ -69,7 +69,8 @@ const ZEmpty = ZBaseNode.extend({
 }).strip().transform((v) => {
     return {
         id: v.id,
-        type: 'noop' as const,
+        type: 'text' as const,
+        code: v.text,
         edges: v.edges,
         fn: v.fn
     }

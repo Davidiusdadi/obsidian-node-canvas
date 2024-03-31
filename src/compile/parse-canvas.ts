@@ -9,7 +9,6 @@ import {visit} from 'unist-util-visit'
 import {logger} from "../globals"
 import {ZEdge} from "./canvas-edge-transform"
 import {Fn} from "../runtime/runtime-types"
-import {js_to_fn} from "../runtime/js-block-to-fn"
 import {parseMd} from "./md-parse"
 import {code_node_compilers} from "./node"
 
@@ -50,31 +49,44 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
         } catch (e) {
             // extract the specific node type from the markdown ast
             if (cnode.type === 'text') { // obsidian will treat all text as markdown
-                const md_html = parseMd(cnode.text)
+                const magic_word_check = cnode.text.replace(/[_*]/g, '').match(/^\s*(\w+):\s*/i)
+                if (magic_word_check) {
+                    const magic_word = magic_word_check[1].toLowerCase()
+                    const text = cnode.text.substring(cnode.text.split('\n')[0].length)
 
-                // grab the first code block
-                visit(md_html, 'code', (md_node, index, parent) => {
-                    if (!onode && md_node.type === 'code') {
-                        //console.log('parsing code node: ', first_child)
-                        onode = preParseNode({
-                                ...md_node,
-                                id: cnode.id
-                            } as any // zod ensures a strict validation or will throw
-                            , context)
+                    for (const comp of code_node_compilers) {
+                        if (comp.magic_word && comp.lang === magic_word) {
+                            onode = preParseNode({
+                                type: 'code',
+                                id: cnode.id,
+                                lang: magic_word,
+                                value: text
+                            }, context)
+                            break
+                        }
                     }
-                })
-
-
+                } else {
+                    const md_html = parseMd(cnode.text)
+                    // grab the first code block
+                    visit(md_html, 'code', (md_node, index, parent) => {
+                        if (!onode && md_node.type === 'code') {
+                            //console.log('parsing code node: ', first_child)
+                            onode = preParseNode({
+                                    ...md_node,
+                                    id: cnode.id
+                                } as any // zod ensures a strict validation or will throw
+                                , context)
+                        }
+                    })
+                }
             }
         }
 
 
         if (onode?.type === 'code') {
-
-
-            for(const comp of code_node_compilers) {
-                if(comp.lang === onode.lang) {
-                    onode.fn =  await comp.compile(onode.code, context)
+            for (const comp of code_node_compilers) {
+                if (comp.lang === onode.lang) {
+                    onode.fn = await comp.compile(onode.code, context)
                     break
                 }
             }

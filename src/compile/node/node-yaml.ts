@@ -3,13 +3,14 @@ import nunjucks from "nunjucks"
 import {ExecutionContext} from "../canvas-node-transform"
 import {CTX, Fn} from "../../runtime/runtime-types"
 import {NodeCompiler} from "./template"
-import {gpt_runner, ZSchemaGPT} from "./node-yaml-gpt-hepler"
+import {gpt_runner_yaml, ZSchemaGPT} from "./node-yaml-gpt-hepler"
 import {yaml_action_runner} from "./node-yaml-action"
+import {logger} from "../../globals"
 
 
 nunjucks.configure({autoescape: false})
 
-const nunjucks_env = new nunjucks.Environment(undefined, {autoescape: false});
+export const nunjucks_env = new nunjucks.Environment(undefined, {autoescape: false});
 
 nunjucks_env.addFilter('json', function (str: string) {
     return JSON.stringify(str, null, 4)
@@ -18,10 +19,10 @@ nunjucks_env.addFilter('json', function (str: string) {
 
 export const json_as_fn = async (json: any, ctx: CTX, canvas_context: ExecutionContext) => {
 
-    console.debug('compiled yaml: ', json)
+    logger.debug('compiled yaml: ', json)
     const completion_opts = ZSchemaGPT.safeParse(json)
     if (completion_opts.success) {
-        return gpt_runner(completion_opts.data, ctx)
+        return gpt_runner_yaml(completion_opts.data, ctx)
     } else {
         return yaml_action_runner(json, ctx, canvas_context)
     }
@@ -33,11 +34,15 @@ export const yaml_to_fn = (yaml_string: string, context: ExecutionContext) => {
 
     const fn: Fn = (ctx, input) => {
         const interpolated = transformObjectStrings(parsed_yaml, (v) => {
-            return nunjucks_env.renderString(v, {input})
+            return template_render(v, ctx)
         })
         return json_as_fn(interpolated, ctx, context)
     }
     return fn
+}
+
+export function template_render(template: string, ctx: CTX) {
+    return nunjucks_env.renderString(template, {input: ctx.input, state: ctx.state, ctx: ctx, this: ctx._this})
 }
 
 function transformObjectStrings(obj: any, transformString: (v: string) => any): any {
