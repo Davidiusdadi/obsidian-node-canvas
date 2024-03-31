@@ -5,7 +5,7 @@ This is what this is about:
 ![](./examples/tutorial/tutorial.png)
 
 
-> To be sure to only see what was created during the hackaton see [branch: during-hackathon](https://github.com/Davidiusdadi/obsidian-node-canvas/tree/during-hackathon). Right now  [master](https://github.com/Davidiusdadi/obsidian-node-canvas/tree/master)-branch and [during-hackathon](https://github.com/Davidiusdadi/obsidian-node-canvas/tree/during-hackathon)-branch should be almost identical.
+> To be sure to only see what was created **during the hackaton** see [branch: during-hackathon](https://github.com/Davidiusdadi/obsidian-node-canvas/tree/during-hackathon). Right now  [master](https://github.com/Davidiusdadi/obsidian-node-canvas/tree/master)-branch and [during-hackathon](https://github.com/Davidiusdadi/obsidian-node-canvas/tree/during-hackathon)-branch should be almost identical.
 
 **Obsidan-Node-Canvas** is a `javascript`-based workflow/scripting engine build on top of [obsidian](https://obsidian.md/)  (the popular and powerful journaling, knowledge bases, and project management tool ) - and specifically https://obsidian.md/canvas.
 
@@ -40,9 +40,72 @@ You could use it to automate things in your obsidian-vault - but the main obsidi
 This project has been submitted [here](https://dacade.org/communities/icp/challenges/b35bd8af-51d3-437a-af13-4e649529c7e5/submissions/5605d208-bb84-4551-9697-e89f75901ce0).
 
 
-## Features
+## Engine Features / Mechanics
 
 tutorials are planned - for now look at the canvases in the [examples folder](./examples).
+
+Here a rough overview:
+
+### general behaviour 
+
+- only one node is active at a time
+- the first code block of each node will be executed
+- execution starts at a with just the content: 'start'
+- there are nodes that do not use code-blocks but special syntax (see below)
+- only directed arrows matter as of now
+- currently all invocations are stored until the canvas complete
+  - aka. circular constructs will leak memory 
+    - this will be fixed when aggregations get an update
+- these are the special variables
+  - `input` - can be anyting
+  - `state` - can be anything - is cloned whenever it passed through an arrow
+  - `this` - is persistant during a node's invocations
+    - holds special `join` object used for flow control (see below)
+  - `ctx` 
+    - allows you to create global state
+    - holds special variables / function:
+      - `emit(label, value)` function - to pass `state` and `input`-value to a node behind and edge with a given label
+        - emits are scheduled aka put on the backlog from which the next invocation is pulled by the engine  
+  - you can normally 
+    - use nodejs globals - e.g. console.log
+    - you can import modules via `import` 
+- flow handling
+  - splitting flow is done by extruding multiple outgoing arrows 
+  - for more see further below
+
+### node types
+
+- start - marks the start
+- code `js`
+- code `ts`
+  - transpiled to js
+- code `yaml`
+  - "write file" (specific format required)
+    - supports nunjucks templating
+  - "prompt gpt" (specific format required)
+    - supports nunjucks templating
+- magic fist word node:
+  - `decide` promptes gpt-3 (will be reworked soon)
+- _identity_ - anything that cant be parsed yet is not specifically wrong (e.g. bad js syntax) will be treated as and identity function `(input) => input`
+  - an empty node will also be and identity node
+### flow control
+
+**inner** is inner join on by a specific variable name:
+```ts
+const list = this.join.inner.input('name').list()
+const merged = this.join.inner.input('name').merge()
+```
+
+**aggregate** will wait for all ancestors to have completed before returning
+```ts
+
+const list = this.join.aggregate.list()
+const merged = this.join.aggregate.merge()
+```
+- currently if you really try you should be able to produce a deadlock...
+  - only if there are 2 aggregates waiting for wach other
+
+More precise flow control is planned.
 
 
 ## how to run
