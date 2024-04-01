@@ -71,12 +71,19 @@ export class InputsFilterJoiner {
     }
 
 
-    protected filter(field: 'state' | 'input', value: any) {
+    protected filter(field: 'state' | 'input', value: string | null | undefined) {
         let inputs = _.clone(this.inputs)
         if (value !== undefined) {
             for (const edge_id of this.edge_ids) {
                 inputs[edge_id] = inputs[edge_id].filter((invocation) => {
-                    return invocation[field] === value
+                    const side_a = invocation[field]
+                    const side_b = this.ctx[field]
+                    if(value === null) {
+                        // when sides are native types like strings or numbers
+                        return side_a === side_b
+                    } else {
+                        return invocation[field]?.[value] === this.ctx[field]?.[value]
+                    }
                 })
             }
             this.check()
@@ -103,7 +110,7 @@ export class InputsFilterJoiner {
     }
 
     merge() {
-        return _.merge({}, this.invocations_by_field)
+        return _.merge({}, ...this.invocations_by_field)
     }
 
     list() {
