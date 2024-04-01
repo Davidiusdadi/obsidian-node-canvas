@@ -1,11 +1,11 @@
 {
 	"nodes":[
-		{"id":"58639c52687968b3","x":34,"y":-60,"width":466,"height":240,"type":"text","text":"```ts\nconst c = this.conv = this.conv ?? []\n\nc.push('user:', input.previous.trim())\nc.push('agent:', input.response.trim())\n\nstate.history = c.join('\\n')\n```"},
-		{"id":"df1851f4064252c5","x":136,"y":260,"width":217,"height":50,"type":"text","text":"**log** {{input}}"},
-		{"id":"20f06ea32d97b600","x":-319,"y":30,"width":279,"height":60,"type":"text","text":"**question** >"},
-		{"id":"fc28285e8ccc5ae2","x":-340,"y":-85,"width":321,"height":50,"type":"text","text":"**log**  Plz open the conversation"},
-		{"id":"2d8bad26233ec9aa","x":-235,"y":-200,"width":115,"height":50,"color":"1","type":"text","text":"start"},
-		{"id":"f97609bd5b42cd1e","x":-359,"y":170,"width":360,"height":330,"type":"text","text":"**llm-prompt** \n\nconversation:\n{{state.history}}\n \n user:{{input}}\n ---\n \nWhat would be a sly reploy?\nDo not prefix you answer with `agent: ` or quotes. Just the plain response:"}
+		{"id":"58639c52687968b3","type":"text","text":"```ts\nconst c = this.conv = this.conv ?? []\n\nc.push('user:', input.previous.trim())\nc.push('agent:', input.response.trim())\n\nstate.history = c.join('\\n')\n```","x":34,"y":-60,"width":466,"height":240},
+		{"id":"20f06ea32d97b600","type":"text","text":"**question** >","x":-359,"y":30,"width":340,"height":60},
+		{"id":"fc28285e8ccc5ae2","type":"text","text":"**log**  Plz open the conversation","x":-359,"y":-85,"width":340,"height":50},
+		{"id":"f97609bd5b42cd1e","type":"text","text":"**llm-prompt** \n\nconversation:\n{{state.history}}\n \n user:{{input}}\n ---\n \nWhat would be a sly response?\nDo not prefix you answer with `agent: ` or quotes. Just the plain response:","x":-359,"y":170,"width":340,"height":330},
+		{"id":"2d8bad26233ec9aa","type":"text","text":"start","x":-247,"y":-180,"width":116,"height":50,"color":"1"},
+		{"id":"df1851f4064252c5","type":"text","text":"**log** {{input}}","x":159,"y":310,"width":217,"height":50}
 	],
 	"edges":[
 		{"id":"f096aec98ad2bec7","fromNode":"2d8bad26233ec9aa","fromSide":"bottom","toNode":"fc28285e8ccc5ae2","toSide":"top"},

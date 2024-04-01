@@ -1,6 +1,12 @@
 # obsidian-node-canvas
 
-This is what this is about:
+Use obsidian canvases for coding and automation:
+
+Example 1:
+
+![](./examples/tutorial/read-eval-loop/sly-llm-agent-screenshot.png)
+
+Example 2:
 
 ![](./examples/tutorial/tutorial.png)
 
@@ -125,7 +131,10 @@ More precise flow control is planned.
 # from the checkout root call:
 
 yarn install # install dependencies
+
 yarn dev --vault examples --canvas tutorial/tutorial.canvas
+yarn dev --vault examples --canvas tutorial/read-eval-loop/sly-llm-agent.canvas
+
 ```
 
 Off you go with your own canvas 🕊️
