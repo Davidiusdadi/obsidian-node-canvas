@@ -1,5 +1,6 @@
 import { Fn } from "../../runtime/runtime-types"
-import type {ExecutionContext} from "../canvas-node-transform"
+
+import {ExecutionContext} from "../types"
 
 
 export interface NodeCompiler {

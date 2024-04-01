@@ -25,6 +25,9 @@ export async function gpt_runner_yaml(data: z.output<typeof ZSchemaGPT>, ctx:  C
     return res
 }
 
+
+
+
 export async function gpt_runner_generic(data: z.output<typeof ZSchemaGPT>, ctx:  CTX) {
     const chatCompletion = await openai.chat.completions.create({
         ...data
@@ -35,6 +38,9 @@ export async function gpt_runner_generic(data: z.output<typeof ZSchemaGPT>, ctx:
     return {
         response,
         previous: ctx.input,
-        prompt: data
+        prompt: data,
+        toString() {
+            return response
+        }
     }
 }

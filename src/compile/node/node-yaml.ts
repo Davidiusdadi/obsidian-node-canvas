@@ -1,11 +1,12 @@
 import yaml from "yaml"
 import nunjucks from "nunjucks"
-import {ExecutionContext} from "../canvas-node-transform"
 import {CTX, Fn} from "../../runtime/runtime-types"
 import {NodeCompiler} from "./template"
 import {gpt_runner_yaml, ZSchemaGPT} from "./node-yaml-gpt-hepler"
 import {yaml_action_runner} from "./node-yaml-action"
 import {logger} from "../../globals"
+
+import {ExecutionContext} from "../types"
 
 
 nunjucks.configure({autoescape: false})

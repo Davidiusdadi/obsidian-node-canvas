@@ -1,0 +1,18 @@
+{
+	"nodes":[
+		{"id":"58639c52687968b3","x":34,"y":-60,"width":466,"height":240,"type":"text","text":"```ts\nconst c = this.conv = this.conv ?? []\n\nc.push('user:', input.previous.trim())\nc.push('agent:', input.response.trim())\n\nstate.history = c.join('\\n')\n```"},
+		{"id":"df1851f4064252c5","x":136,"y":260,"width":217,"height":50,"type":"text","text":"**log** {{input}}"},
+		{"id":"20f06ea32d97b600","x":-319,"y":30,"width":279,"height":60,"type":"text","text":"**question** >"},
+		{"id":"fc28285e8ccc5ae2","x":-340,"y":-85,"width":321,"height":50,"type":"text","text":"**log**  Plz open the conversation"},
+		{"id":"2d8bad26233ec9aa","x":-235,"y":-200,"width":115,"height":50,"color":"1","type":"text","text":"start"},
+		{"id":"f97609bd5b42cd1e","x":-359,"y":170,"width":360,"height":330,"type":"text","text":"**llm-prompt** \n\nconversation:\n{{state.history}}\n \n user:{{input}}\n ---\n \nWhat would be a sly reploy?\nDo not prefix you answer with `agent: ` or quotes. Just the plain response:"}
+	],
+	"edges":[
+		{"id":"f096aec98ad2bec7","fromNode":"2d8bad26233ec9aa","fromSide":"bottom","toNode":"fc28285e8ccc5ae2","toSide":"top"},
+		{"id":"4e872da3fa048944","fromNode":"fc28285e8ccc5ae2","fromSide":"bottom","toNode":"20f06ea32d97b600","toSide":"top"},
+		{"id":"5000b963c20d30f7","fromNode":"20f06ea32d97b600","fromSide":"bottom","toNode":"f97609bd5b42cd1e","toSide":"top"},
+		{"id":"eaa0a9ffbacca8ef","fromNode":"58639c52687968b3","fromSide":"left","toNode":"20f06ea32d97b600","toSide":"right"},
+		{"id":"945c9f703134b913","fromNode":"f97609bd5b42cd1e","fromSide":"right","toNode":"df1851f4064252c5","toSide":"left"},
+		{"id":"551e4a2da095ca64","fromNode":"df1851f4064252c5","fromSide":"top","toNode":"58639c52687968b3","toSide":"bottom"}
+	]
+}

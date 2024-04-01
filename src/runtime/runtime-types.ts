@@ -25,4 +25,4 @@ export type FnThis = {
     // join it will always be set during node execution
     join?: InputsFilterJoiner
 }
-export type Fn = (this: FnThis, ctx: CTX, input: any) => any
+export type Fn = (this: FnThis, ctx: CTX, input: any) => any | Promise<any>

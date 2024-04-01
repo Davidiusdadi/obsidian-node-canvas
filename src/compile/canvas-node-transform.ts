@@ -5,11 +5,7 @@ import {z} from 'zod'
 import {ZEdge} from "./canvas-edge-transform"
 import {Fn} from "../runtime/runtime-types"
 
-
-export interface ExecutionContext {
-    vault_dir: string
-    canvas_path: string
-}
+import {ExecutionContext} from "./types"
 
 
 const ZBaseNode = z.object({

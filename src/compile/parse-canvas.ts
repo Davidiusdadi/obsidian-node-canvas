@@ -1,6 +1,6 @@
 import path from "node:path"
 import {writeFileSync} from "node:fs"
-import {ExecutionContext, ONode, preParseNode} from "./canvas-node-transform"
+import {ONode, preParseNode} from "./canvas-node-transform"
 import {readFile} from "fs/promises"
 import {GenericNode, GroupNode, JSONCanvas, LinkNode, TextNode} from '@trbn/jsoncanvas'
 import {GlobalContext, ParsedCanvas} from "../types"
@@ -11,6 +11,7 @@ import {ZEdge} from "./canvas-edge-transform"
 import {Fn} from "../runtime/runtime-types"
 import {parseMd} from "./md-parse"
 import {code_node_compilers} from "./node"
+import {ExecutionContext} from "./types"
 
 /** @trbn/jsoncanvas types are not complete - these are:  */
 type JSONCanvasNode = LinkNode | TextNode | GenericNode & {
@@ -38,7 +39,8 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
 
     const onode_data = new Map<string, ONode>()
 
-
+    const magic_words = code_node_compilers.filter(c => c.magic_word).map(c => c.lang)
+    const magic_word_regex = new RegExp(`^(\\s*[_*]+(${magic_words.join('|')}):?[_*]+:?\\s*).+`, 'i')
     for (const cnode of canvas_data.getNodes() as JSONCanvasNode[]) {
         let onode: ONode | undefined = undefined
 
@@ -49,10 +51,12 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
         } catch (e) {
             // extract the specific node type from the markdown ast
             if (cnode.type === 'text') { // obsidian will treat all text as markdown
-                const magic_word_check = cnode.text.replace(/[_*]/g, '').match(/^\s*(\w+):\s*/i)
+                const magic_word_check = cnode.text.match(magic_word_regex)
                 if (magic_word_check) {
-                    const magic_word = magic_word_check[1].toLowerCase()
-                    const text = cnode.text.substring(cnode.text.split('\n')[0].length)
+                    const magic_word = magic_word_check[2].toLowerCase()
+                    const text = cnode.text.substring(magic_word_check[1].length)
+
+                    logger.debug('magic word:', magic_word, 'text:', text)
 
                     for (const comp of code_node_compilers) {
                         if (comp.magic_word && comp.lang === magic_word) {
@@ -100,7 +104,8 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
             onode = {
                 id: cnode.id,
                 fn: (ctx, input) => input,
-                type: 'noop',
+                type: 'text',
+                code: cnode.type === 'text' ? cnode.text : '',
                 edges: []
             }
         }
