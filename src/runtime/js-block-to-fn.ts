@@ -5,7 +5,6 @@ export function js_to_fn(code: string): Fn {
     const instr_code = `
 return (async () => {
 let state = ctx.state;
-const inputs = ctx.inputs;
 
 const emit = (...args) => {
     ctx.state = state;
