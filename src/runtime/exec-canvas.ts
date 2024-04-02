@@ -1,5 +1,5 @@
 import {ONode} from "../compile/canvas-node-transform"
-import {InputsFilterJoiner} from "./code_to_fn"
+import {InputsFilterJoiner} from "./joins"
 import z, {object} from "zod"
 import _ from "lodash"
 import {logger} from "../globals"
@@ -60,7 +60,9 @@ export async function execCanvas(node_data: ParsedCanvas, context: GlobalContext
         // _this will be set during node execution
         _this: {} as any,
         onodes: instr,
-        onode: {} as any // will be set during node execution
+        onode: {} as any, // will be set during node execution
+        updateInput: (input) => ctx.input = input,
+        updateState: (state) => ctx.state = state
     }
 
     const stack_push = (edges: z.output<typeof ZEdge>[], value: any) => {
@@ -78,7 +80,7 @@ export async function execCanvas(node_data: ParsedCanvas, context: GlobalContext
             node_this_data.get(frame.node.id)!._invocations[frame.edge.id!]!.push(frame)
             const already_aggregating = stack.some((sf) => sf.node === frame.node && sf.is_aggregating)
             if (!already_aggregating) {
-                stack.unshift(frame)
+                stack.push(frame)
             }
         })
 

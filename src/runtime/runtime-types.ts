@@ -1,6 +1,6 @@
 import {ONode} from "../compile/canvas-node-transform"
 import {OEdge} from "../compile/canvas-edge-transform"
-import {InputsFilterJoiner} from "./code_to_fn"
+import {InputsFilterJoiner} from "./joins"
 
 export type CTX = {
     emit: (label: string, value: any) => void
@@ -10,6 +10,8 @@ export type CTX = {
     state: any,
     onode: ONode
     onodes: ONode[]
+    updateInput: (new_input: any) => void
+    updateState: (new_state: any) => void
 } & Record<string, any>
 
 export interface StackFrame {
@@ -26,3 +28,4 @@ export type FnThis = {
     join?: InputsFilterJoiner
 }
 export type Fn = (this: FnThis, ctx: CTX, input: any) => any | Promise<any>
+
