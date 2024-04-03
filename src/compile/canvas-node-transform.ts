@@ -15,17 +15,18 @@ const ZBaseNode = z.object({
         .transform((fn) => {
             return ((ctx, input) => input) satisfies Fn
         }),
-})
+}).passthrough()
 
 const ZNodeStart = ZBaseNode.extend({
     type: z.literal('text'),
     text: z.literal('start')
-}).strip().transform((v) => {
+}).passthrough().transform((v) => {
     return {
         id: v.id,
         type: 'start' as const,
         edges: v.edges,
-        fn: v.fn
+        fn: v.fn,
+        original: v as object
     }
 })
 
@@ -33,42 +34,45 @@ const ZCodeNode = ZBaseNode.extend({
     type: z.literal('code'),
     lang: z.string().default(''),
     value: z.string()
-}).strip().transform((v) => {
+}).passthrough().transform((v) => {
     return {
         type: 'code' as const,
         id: v.id,
         edges: v.edges,
         code: v.value,
         lang: v.lang,
-        fn: v.fn
+        fn: v.fn,
+        original: v as object
     }
 })
 
 const ZNodeUrl = ZBaseNode.extend({
     type: z.literal('link'),
     url: z.string().url()
-}).strip().transform((v) => {
+}).passthrough().transform((v) => {
     return {
         id: v.id,
         type: 'url' as const,
         edges: v.edges,
         fn: () => {
             return v.url
-        }
+        },
+        original: v as object
     }
 })
 
-const ZEmpty = ZBaseNode.extend({
+const ZText = ZBaseNode.extend({
     id: z.string(),
     type: z.literal('text'),
-    text: z.string().refine(s => s.trim().length === 0)
-}).strip().transform((v) => {
+    text: z.string().refine(s => s.trim() !== 'start')
+}).passthrough().transform((v) => {
     return {
         id: v.id,
         type: 'text' as const,
         code: v.text,
         edges: v.edges,
-        fn: v.fn
+        fn: v.fn,
+        original: v as object
     }
 })
 
@@ -76,10 +80,13 @@ const ZEmpty = ZBaseNode.extend({
 const ZGroup = ZBaseNode.extend({
     id: z.string(),
     type: z.literal('group'),
-
-}).strip().transform((v) => {
+}).passthrough().transform((v) => {
     return {
-        ...v
+        id: v.id,
+        type: 'group' as const,
+        edges: v.edges,
+        fn: v.fn,
+        original: v as object,
     }
 })
 
@@ -87,13 +94,22 @@ const ZGroup = ZBaseNode.extend({
 const ZFile = ZBaseNode.extend({
     type: z.literal('file'),
     file: z.string(),
-}).strip()
+}).passthrough().transform((v) => {
+    return {
+        id: v.id,
+        type: 'file' as const,
+        file: v.file,
+        edges: v.edges,
+        fn: v.fn,
+        original: v as object
+    }
+})
 
 
 export const NodeVariant = z.union([
     ZNodeStart,
     ZNodeUrl,
-    ZEmpty,
+    ZText,
     ZCodeNode,
     ZGroup,
     ZFile

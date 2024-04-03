@@ -12,9 +12,10 @@ import {Fn} from "../runtime/runtime-types"
 import {parseMd} from "./md-parse"
 import {ExecutionContext} from "./types"
 import code_node_compilers from "../node_library"
+import {loadFileNode} from "./file-loader"
 
 /** @trbn/jsoncanvas types are not complete - these are:  */
-type JSONCanvasNode = LinkNode | TextNode | GenericNode & {
+export type JSONCanvasNode = LinkNode | TextNode | GenericNode & {
     type: 'file'
     file: string
 } | GroupNode & {
@@ -44,45 +45,62 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
     for (const cnode of canvas_data.getNodes() as JSONCanvasNode[]) {
         let onode: ONode | undefined = undefined
 
-        try {
-            // some canvas nodes can be directly transformed
-            // e.g. link, file, and some text nodes
-            onode = preParseNode(cnode, context)
-        } catch (e) {
-            // extract the specific node type from the markdown ast
-            if (cnode.type === 'text') { // obsidian will treat all text as markdown
-                const magic_word_check = cnode.text.match(magic_word_regex)
-                if (magic_word_check) {
-                    const magic_word = magic_word_check[2].toLowerCase()
-                    const text = cnode.text.substring(magic_word_check[1].length)
 
-                    logger.debug('magic word:', magic_word, 'text:', text)
+        // some canvas nodes can be directly transformed
+        // e.g. link, file, and some text nodes
+        onode = preParseNode(cnode as any, context)
 
-                    for (const comp of code_node_compilers) {
-                        if (comp.magic_word && comp.lang === magic_word) {
-                            onode = preParseNode({
-                                type: 'code',
-                                id: cnode.id,
-                                lang: magic_word,
-                                value: text
-                            }, context)
-                            break
-                        }
+        if (onode.type === 'file') {
+            const loaded_node = await loadFileNode(onode, context)
+            if (loaded_node.type === 'text') {
+                onode = preParseNode({
+                    type: 'text',
+                    id: loaded_node.id,
+                    text: loaded_node.code
+                }, context)
+                onode.original = cnode
+                // text nodes will be treated as in the next step
+            } else {
+                // canvas node goes through here
+                onode = loaded_node
+            }
+        }
+
+
+        if (onode && onode.type === 'text') { // obsidian will treat all text as markdown
+            const magic_word_check = onode.code.match(magic_word_regex)
+            if (magic_word_check) {
+                const magic_word = magic_word_check[2].toLowerCase()
+                const text = onode.code.substring(magic_word_check[1].length)
+
+                logger.debug('magic word:', magic_word, 'text:', text)
+
+                for (const comp of code_node_compilers) {
+                    if (comp.magic_word && comp.lang === magic_word) {
+                        onode = preParseNode({
+                            type: 'code',
+                            id: cnode.id,
+                            lang: magic_word,
+                            value: text
+                        }, context)
+                        break
                     }
-                } else {
-                    const md_html = parseMd(cnode.text)
-                    // grab the first code block
-                    visit(md_html, 'code', (md_node, index, parent) => {
-                        if (!onode && md_node.type === 'code') {
-                            //console.log('parsing code node: ', first_child)
-                            onode = preParseNode({
-                                    ...md_node,
-                                    id: cnode.id
-                                } as any // zod ensures a strict validation or will throw
-                                , context)
-                        }
-                    })
                 }
+            } else {
+                const md_html = parseMd(onode.code)
+                let found_code = false
+                // grab the first code block
+                visit(md_html, 'code', (md_node, index, parent) => {
+                    if (!found_code && md_node.type === 'code') {
+                        //console.log('parsing code node: ', first_child)
+                        onode = preParseNode({
+                                ...md_node,
+                                id: cnode.id
+                            } as any // zod ensures a strict validation or will throw
+                            , context)
+                        found_code = true
+                    }
+                })
             }
         }
 
@@ -106,7 +124,8 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
                 fn: (ctx, input) => input,
                 type: 'text',
                 code: cnode.type === 'text' ? cnode.text : '',
-                edges: []
+                edges: [],
+                original: cnode
             }
         }
 
