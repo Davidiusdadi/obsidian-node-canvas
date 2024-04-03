@@ -55,7 +55,7 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, context: Globa
             return {
                 node: node,
                 input: value,
-                state: _.cloneDeep(ctx.state),
+                state: _.clone(ctx.state),
                 edge: e,
                 is_aggregating: false,
                 chart: source_frame.chart

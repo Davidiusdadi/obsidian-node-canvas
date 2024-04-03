@@ -94,25 +94,54 @@ Here a rough overview:
   - `decide` promptes gpt-3 (will be reworked soon)
 - _identity_ - anything that cant be parsed yet is not specifically wrong (e.g. bad js syntax) will be treated as and identity function `(input) => input`
   - an empty node will also be and identity node
+
+
 ### flow control
 
-**inner** is inner join on by a specific variable name:
+- Every node will have `input` and `state` variables defined.
+- By default, the `return` value of a previous node will be forwarded as `input` to the next one.
+- `state` will always be passed along from node to node - on each handover **being cloned** shallowly. 
+
+> What happens though when a node has more that 1 arrow pointing to it?
+
+In that case each arrow is treated as a separate invocation. 
+E.g. with 2 incoming arrows each might be invoked as the code will be executed twice in a row.
+
+This is unless you use **advanced flow control**:
+
+#### aggregation
+
+The most powerful is the function `aggregate`.
+When used it will make the node go into a collection mode which means that it 
+- waits until everything before it has finished
+- and when the last activity before it finishes it will return all collected inputs.
+  - either as array: `aggregate().list()`
+  - or merged together:  `aggregate().merge()`
+
+for examples see: `zip-and-aggregate.canvas`
+
+- more precise "aggregation"-sections are planned
+- Bug: Currently, if you really try you should be able to produce a deadlock if there are 2 aggregates waiting for wach other.
+
+#### zipping
+
+With `zipOnInput` or `zipOnState` will be used to "join" together specific `input`s or `state`s.
+
 ```ts
-const list = this.join.inner.input('name').list()
-const merged = this.join.inner.input('name').merge()
+const list = zipOnInput('name').list()
 ```
 
-**aggregate** will wait for all ancestors to have completed before returning
-```ts
+If the above node would have more than 2 or 3 in-arrows it would only grab those with identical `input.name` values. Imagine each arrow having a buffer of invocations which still want to be consumed. Whenever a new invocation is coming it will be checked if a new zip-input is ready where all arrows `input.name`s are identical. As soon as a zip-input is ready it will be consumed as `.list()` or `.merge()`.
 
-const list = this.join.aggregate.list()
-const merged = this.join.aggregate.merge()
-```
-- currently if you really try you should be able to produce a deadlock...
-  - only if there are 2 aggregates waiting for wach other
+Analogous there is also `const list = zipOnState('name').list()` and `const list = zipOnState('name').merge()`.
 
-More precise flow control is planned.
+##### zip merge example 1:
 
+![img.png](examples/tutorial/flow-control/images/example-zip-simple-success.png)
+
+##### zip merge example 2:
+
+![img_1.png](examples/tutorial/flow-control/images/example-zip-partial-success.png)
 
 ## how to run
 
@@ -134,6 +163,8 @@ yarn install # install dependencies
 
 yarn dev --vault examples --canvas tutorial/tutorial.canvas
 yarn dev --vault examples --canvas tutorial/read-eval-loop/sly-llm-agent.canvas
+yarn dev --vault examples --canvas tutorial/flow-control/zip-and-aggregate.canvas
+yarn dev --vault examples --canvas tutorial/reference-file/hello.canvas
 
 ```
 
