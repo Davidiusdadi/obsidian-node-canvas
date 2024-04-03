@@ -3,9 +3,10 @@ import chalk from "chalk"
 
 export function js_to_fn(code: string): Fn {
     const instr_code = `
-return (async () => {
 
-let state = ctx.state;
+let state = ctx.state;    
+    
+return (async () => {
 let input = ctx.input;
 
 // join and aggregate if used will update the state and input
@@ -33,8 +34,9 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 ${code}
 
-ctx.state = state;
-})()
+})().finally(() => {
+    ctx.state = state;
+});
 `
     try {
         const fn = new Function('ctx', instr_code) as Fn
