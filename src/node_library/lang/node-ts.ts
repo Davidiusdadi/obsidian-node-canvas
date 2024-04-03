@@ -1,5 +1,5 @@
 import typescript from 'typescript';
-import {NodeCompiler} from "./template"
+import {NodeCompiler} from "../../compile/template"
 import {js_to_fn} from "../../runtime/js-block-to-fn"
 //import * as babel from '@babel/core';
 // Example TypeScript code

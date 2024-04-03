@@ -1,6 +1,6 @@
-import { Fn } from "../../runtime/runtime-types"
+import { Fn } from "../runtime/runtime-types"
 
-import {ExecutionContext} from "../types"
+import {ExecutionContext} from "./types"
 
 
 export interface NodeCompiler {

@@ -1,7 +1,7 @@
 import OpenAI from "openai"
 import z from "zod"
-import {CTX} from "../../runtime/runtime-types"
-import {logger} from "../../globals"
+import {CTX} from "../../../runtime/runtime-types"
+import {logger} from "../../../globals"
 import chalk from "chalk"
 
 

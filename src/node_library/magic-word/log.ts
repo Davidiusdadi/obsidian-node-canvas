@@ -1,5 +1,5 @@
-import {NodeCompiler} from "../compile/node/template"
-import {nunjucks_env, template_render} from "../compile/node/node-yaml"
+import {NodeCompiler} from "../../compile/template"
+import {nunjucks_env, template_render} from "../lang/yaml"
 
 
 export default {

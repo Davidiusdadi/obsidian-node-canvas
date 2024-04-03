@@ -1,6 +1,6 @@
-import {NodeCompiler} from "../compile/node/template"
+import {NodeCompiler} from "../../compile/template"
 import * as readline from 'readline';
-import {template_render} from "../compile/node/node-yaml"
+import {template_render} from "../lang/yaml"
 
 // Function to read a line from stdin
 const readLineAsync = (query: string): Promise<string> => {

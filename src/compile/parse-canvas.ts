@@ -10,8 +10,8 @@ import {logger} from "../globals"
 import {ZEdge} from "./canvas-edge-transform"
 import {Fn} from "../runtime/runtime-types"
 import {parseMd} from "./md-parse"
-import {code_node_compilers} from "./node"
 import {ExecutionContext} from "./types"
+import code_node_compilers from "../node_library"
 
 /** @trbn/jsoncanvas types are not complete - these are:  */
 type JSONCanvasNode = LinkNode | TextNode | GenericNode & {

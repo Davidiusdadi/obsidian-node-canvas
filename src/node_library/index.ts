@@ -1,10 +1,7 @@
-import question from './question'
-import nodeInlineDecide from './decide'
-import log from './log'
-import llmPrompt from './llm-prompt'
-export default [
-    nodeInlineDecide,
-    question,
-    log,
-    llmPrompt
+import lang_nodes from './lang'
+import magic_word_nodes from './magic-word'
+
+export default  [
+    ...lang_nodes,
+    ...magic_word_nodes,
 ]

@@ -1,11 +1,11 @@
 import z from "zod"
-import {CTX} from "../../runtime/runtime-types"
+import {CTX} from "../../../runtime/runtime-types"
 import path from "path"
 import {mkdirSync} from "fs"
 import {writeFileSync} from "node:fs"
-import {BadCanvasInstruction} from "../../runtime/errors"
+import {BadCanvasInstruction} from "../../../runtime/errors"
 
-import {ExecutionContext} from "../types"
+import {ExecutionContext} from "../../../compile/types"
 
 const zYamlWriteFile = z.object({
     action: z.literal('write'),

@@ -1,7 +1,7 @@
-import {NodeCompiler} from "../compile/node/template"
-import {gpt_runner_generic} from "../compile/node/node-yaml-gpt-hepler"
-import {logger} from "../globals"
-import {template_render} from "../compile/node/node-yaml"
+import {NodeCompiler} from "../../compile/template"
+import {gpt_runner_generic} from "../lang/yaml/node-yaml-gpt-hepler"
+import {logger} from "../../globals"
+import {template_render} from "../lang/yaml"
 import chalk from "chalk"
 
 export default {
