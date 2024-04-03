@@ -1,55 +1,23 @@
-import {ONode} from "../compile/canvas-node-transform"
 import {InputsFilterJoiner} from "./joins"
 import z, {object} from "zod"
 import _ from "lodash"
 import {logger} from "../globals"
 
-import {GlobalContext, ParsedCanvas} from "../types"
+import {GlobalContext} from "../types"
 import chalk from "chalk"
 import {ZEdge} from "../compile/canvas-edge-transform"
-import {CTX, FnThis, StackFrame} from "./runtime-types"
+import {CTX, StackFrame} from "./runtime-types"
 import {InputsNotFullfilled} from "./errors"
+import {ExecutableCanvas} from "./ExecutableCanvas"
 
 /**
  * This holds the main execution loop.
  * It receives fully parsed and configured nodes ready for execution.
  **/
-export async function execCanvas(node_data: ParsedCanvas, context: GlobalContext) {
-    const instr = [...node_data.values()]
-    const start = instr.filter(ins => ins.type === 'start')
-    if (start.length !== 1) {
-        throw new Error(`no unique start node found: found ${start.length}`)
-    }
+export async function execCanvas(inital_canvas: ExecutableCanvas, context: GlobalContext) {
 
 
-    let stack: StackFrame[] = [{
-        node: start[0],
-        input: undefined,
-        state: {},
-        edge: null,
-        is_aggregating: false
-    }]
-
-    const node_this_data = new Map<string, FnThis>()
-    const node_ancestors = new Map<string, Set<string>>()
-
-    // use nodes this context to keep track of invocations
-    // which is useful for joining flows
-    instr.forEach(node => {
-        const node_this_init = {
-            _invocations: Object.assign({}, ...node.edges.filter((edge) => {
-                return edge.direction === 'forward' && edge.to === node.id
-            }).map((edge) => {
-                return {
-                    [edge.id]: [] as any[]
-                }
-            }))
-        } satisfies FnThis
-        node_this_data.set(node.id, node_this_init)
-
-        const ancestors = collect_ancestor(instr, node)
-        node_ancestors.set(node.id, ancestors)
-    })
+    let stack: StackFrame[] = []
 
     const ctx: CTX = {
         emit: () => undefined,
@@ -57,34 +25,49 @@ export async function execCanvas(node_data: ParsedCanvas, context: GlobalContext
         state: object,
         vault_dir: context.vault_dir,
         inputs: [undefined],
-        // _this will be set during node execution
-        _this: {} as any,
-        onodes: instr,
-        onode: {} as any, // will be set during node execution
+        _this: {} as any,  // _this will be set during node execution
+        self_canvas_nodes: {} as any,  // will be set during node execution
+        self_canvas_node: {} as any, // will be set during node execution
         updateInput: (input) => ctx.input = input,
-        updateState: (state) => ctx.state = state
+        updateState: (state) => ctx.state = state,
+        injectFrame: (frame: StackFrame) => stack.push(frame)
     }
 
-    const stack_push = (edges: z.output<typeof ZEdge>[], value: any) => {
+
+    inital_canvas.nodes.filter((node) => node.type === 'start').forEach((node) => {
+        ctx.injectFrame({
+            node,
+            input: undefined,
+            state: {},
+            edge: null,
+            is_aggregating: false,
+            chart: inital_canvas
+        })
+    })
+
+    if (stack.length === 0) {
+        throw new Error(`no start point for execution found in canvas`)
+    }
+
+    const stack_push = (source_frame: StackFrame, edges: z.output<typeof ZEdge>[], value: any) => {
         const insert = edges.map(e => {
-            const node = node_data.get(e.to)!
+            const node = source_frame.chart.node_map.get(e.to)!
             return {
                 node: node,
                 input: value,
                 state: _.cloneDeep(ctx.state),
                 edge: e,
-                is_aggregating: false
+                is_aggregating: false,
+                chart: source_frame.chart
             } satisfies StackFrame
         })
         insert.forEach(frame => {
-            node_this_data.get(frame.node.id)!._invocations[frame.edge.id!]!.push(frame)
+            source_frame.chart.node_this_data.get(frame.node.id)!._invocations[frame.edge.id!]!.push(frame)
             const already_aggregating = stack.some((sf) => sf.node === frame.node && sf.is_aggregating)
             if (!already_aggregating) {
                 stack.push(frame)
             }
         })
-
-
     }
 
     while (true) {
@@ -96,12 +79,12 @@ export async function execCanvas(node_data: ParsedCanvas, context: GlobalContext
         const all_aggregations = stack.filter((frame) => frame.is_aggregating)
         const first_ready_aggregation = all_aggregations
             .find((frame) => {
-                const ancestors = node_ancestors.get(frame.node.id)!
+                const ancestors = frame.chart.node_ancestors.get(frame.node.id)!
                 return stack.every((frame) => !ancestors.has(frame.node.id))
             })
 
 
-        if(first_ready_aggregation ) {
+        if (first_ready_aggregation) {
             // finish off running aggregations first
             frame = first_ready_aggregation
             // remove this frame from stack
@@ -138,11 +121,12 @@ export async function execCanvas(node_data: ParsedCanvas, context: GlobalContext
 
 
         if (node.fn) {
-            const this_data = node_this_data.get(node.id)!
+            const this_data = frame.chart.node_this_data.get(node.id)!
             ctx._this = this_data
             ctx.state = state
             ctx.input = input
-            ctx.onode = node
+            ctx.self_canvas_node = node
+            ctx.self_canvas_nodes = frame.chart
             this_data.join = InputsFilterJoiner.create(ctx, frame)
             ctx.emit = (label: string, emission: any) => {
                 logger.debug('emitting: ', label, emission)
@@ -150,10 +134,10 @@ export async function execCanvas(node_data: ParsedCanvas, context: GlobalContext
                     return edge.direction === 'forward' && edge.from === node.id && edge.label?.trim() === label
                 })
 
-                stack_push(edges_label_out, emission)
+                stack_push(frame!, edges_label_out, emission)
             }
 
-            node_this_data.set(node.id, this_data)
+            frame.chart.node_this_data.set(node.id, this_data)
             try {
                 return_value = await node.fn.call(this_data, ctx, input)
             } catch (e) {
@@ -174,31 +158,9 @@ export async function execCanvas(node_data: ParsedCanvas, context: GlobalContext
 
 
         logger.debug(`following edges: ${edges_default_out.length}`)
-        stack_push(edges_default_out, return_value)
+        stack_push(frame, edges_default_out, return_value)
     }
-    console.log('execution complete')
 
 }
 
 
-/** collects and returns ancestor_node_ids */
-function collect_ancestor(all_nodes: ONode[], node: ONode, ancestor_node_ids: Set<string> = new Set<string>()) {
-
-    const edges_in = node.edges
-        .filter((edge) => {
-            return edge.direction === 'forward' && edge.to === node.id
-        }).map(e => e.from)
-
-    const parents = all_nodes.filter(n => edges_in.includes(n.id))
-
-    for (const parent of parents) {
-        if (ancestor_node_ids.has(parent.id)) {
-            continue
-        }
-        ancestor_node_ids.add(parent.id)
-        collect_ancestor(all_nodes, parent, ancestor_node_ids)
-    }
-
-    return ancestor_node_ids
-
-}
