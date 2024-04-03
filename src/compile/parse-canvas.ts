@@ -109,6 +109,7 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
             for (const comp of code_node_compilers) {
                 if (comp.lang === onode.lang) {
                     onode.fn = await comp.compile(onode.code, context)
+                    onode.compiler = comp
                     break
                 }
             }
@@ -146,16 +147,6 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
         const node_with_edges = node as Extract<typeof node, { edges: any }>
         if (node_with_edges.edges !== undefined) {
             node_with_edges.edges = node_edges
-        }
-
-        if (node.type === 'file') {
-            node.fn = ((ctx, input) => {
-                const content = typeof input === 'object' ? JSON.stringify(input, null, 2) : input
-                const target_path = path.join(config.vault_dir, node.file)
-                console.log('writing file: ', target_path, content)
-                writeFileSync(target_path, content)
-                return input
-            }) satisfies Fn
         }
     }
     return onode_data

@@ -1,5 +1,5 @@
 import {InputsFilterJoiner} from "./joins"
-import z, {object} from "zod"
+import z from "zod"
 import _ from "lodash"
 import {logger} from "../globals"
 
@@ -7,7 +7,7 @@ import {GlobalContext} from "../types"
 import chalk from "chalk"
 import {ZEdge} from "../compile/canvas-edge-transform"
 import {CTX, StackFrame} from "./runtime-types"
-import {InputsNotFullfilled} from "./errors"
+import {InputsNotFullfilled, NodeReturnNotIntendedByDesign} from "./errors"
 import {ExecutableCanvas} from "./ExecutableCanvas"
 
 /**
@@ -19,29 +19,15 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, context: Globa
 
     let stack: StackFrame[] = []
 
-    const ctx: CTX = {
-        emit: () => undefined,
-        input: undefined,
-        state: object,
-        vault_dir: context.vault_dir,
-        inputs: [undefined],
-        _this: {} as any,  // _this will be set during node execution
-        self_canvas_nodes: {} as any,  // will be set during node execution
-        self_canvas_node: {} as any, // will be set during node execution
-        updateInput: (input) => ctx.input = input,
-        updateState: (state) => ctx.state = state,
-        injectFrame: (frame: StackFrame) => stack.push(frame)
-    }
-
 
     inital_canvas.nodes.filter((node) => node.type === 'start').forEach((node) => {
-        ctx.injectFrame({
+        stack.push({
             node,
             input: undefined,
             state: {},
             edge: null,
             is_aggregating: false,
-            chart: inital_canvas
+            chart: inital_canvas,
         })
     })
 
@@ -55,7 +41,7 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, context: Globa
             return {
                 node: node,
                 input: value,
-                state: _.clone(ctx.state),
+                state: _.clone(source_frame.ctx!.state),
                 edge: e,
                 is_aggregating: false,
                 chart: source_frame.chart
@@ -122,26 +108,37 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, context: Globa
 
         if (node.fn) {
             const this_data = frame.chart.node_this_data.get(node.id)!
-            ctx._this = this_data
-            ctx.state = state
-            ctx.input = input
-            ctx.self_canvas_node = node
-            ctx.self_canvas_nodes = frame.chart
-            this_data.join = InputsFilterJoiner.create(ctx, frame)
-            ctx.emit = (label: string, emission: any) => {
-                logger.debug('emitting: ', label, emission)
-                const edges_label_out = node.edges.filter((edge) => {
-                    return edge.direction === 'forward' && edge.from === node.id && edge.label?.trim() === label
-                })
 
-                stack_push(frame!, edges_label_out, emission)
+            const ctx: CTX = {
+                input: input,
+                state: state,
+                vault_dir: context.vault_dir,
+                _this: this_data,
+                self_canvas_nodes: frame.chart,  // will be set during node execution
+                self_canvas_node: node, // will be set during node execution
+                updateInput: (input) => ctx.input = input,
+                updateState: (state) => ctx.state = state,
+                injectFrame: (frame: StackFrame) => stack.push(frame),
+                emit: (label: string, emission: any) => {
+                    logger.debug('emitting: ', label, emission)
+                    const edges_label_out = node.edges.filter((edge) => {
+                        return edge.direction === 'forward' && edge.from === node.id && edge.label?.trim() === label
+                    })
+                    stack_push(frame!, edges_label_out, emission)
+                },
             }
+            frame.ctx = ctx
+
+            this_data.join = InputsFilterJoiner.create(ctx, frame)
+
 
             frame.chart.node_this_data.set(node.id, this_data)
             try {
                 return_value = await node.fn.call(this_data, ctx, input)
             } catch (e) {
-                if (e instanceof InputsNotFullfilled) {
+                if (e instanceof NodeReturnNotIntendedByDesign) {
+                    continue // for some nodes a final return does not make sense
+                } else if (e instanceof InputsNotFullfilled) {
                     if (e.is_aggregating) {
                         frame.is_aggregating = true
                         stack.unshift(frame)

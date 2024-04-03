@@ -24,6 +24,8 @@ export interface StackFrame {
     edge: null | OEdge
     is_aggregating: boolean
     chart: ExecutableCanvas
+    // will be set when the frame is being invoked
+    ctx?: CTX
 }
 
 export type FnThis = {

@@ -12,3 +12,8 @@ export class InputsNotFullfilled extends Error {
 export class BadCanvasInstruction extends Error {
 
 }
+
+// e.g. arrow to a .canvas should not "return"
+export class NodeReturnNotIntendedByDesign extends Error {
+
+}

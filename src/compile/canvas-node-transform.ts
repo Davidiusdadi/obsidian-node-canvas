@@ -6,6 +6,7 @@ import {ZEdge} from "./canvas-edge-transform"
 import {Fn} from "../runtime/runtime-types"
 
 import {ExecutionContext} from "./types"
+import {NodeCompiler} from "./template"
 
 
 const ZBaseNode = z.object({
@@ -42,7 +43,8 @@ const ZCodeNode = ZBaseNode.extend({
         code: v.value,
         lang: v.lang,
         fn: v.fn,
-        original: v as object
+        original: v as object,
+        compiler: undefined as NodeCompiler | undefined
     }
 })
 
