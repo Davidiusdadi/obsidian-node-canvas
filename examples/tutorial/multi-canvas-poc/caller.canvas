@@ -1,9 +1,9 @@
 {
 	"nodes":[
 		{"id":"38d076dde3453210","type":"text","text":"start","x":-304,"y":-221,"width":104,"height":60},
-		{"id":"b4dcbb1fd8690ae8","type":"file","file":"tutorial/muli-canvas/callee.canvas","x":-378,"y":-60,"width":252,"height":220},
+		{"id":"b4dcbb1fd8690ae8","type":"file","file":"tutorial/multi-canvas-poc/callee.canvas","x":-378,"y":-60,"width":252,"height":220},
 		{"id":"8dadc3e54b9e3466","type":"text","text":"**log** signal1: {{input}}","x":60,"y":-140,"width":250,"height":60},
-		{"id":"8aece518d556e700","x":60,"y":160,"width":250,"height":60,"type":"text","text":"**log** signal2: {{input}}"}
+		{"id":"8aece518d556e700","type":"text","text":"**log** signal2: {{input}}","x":60,"y":160,"width":250,"height":60}
 	],
 	"edges":[
 		{"id":"870b140a50bd116f","fromNode":"38d076dde3453210","fromSide":"bottom","toNode":"b4dcbb1fd8690ae8","toSide":"top"},
