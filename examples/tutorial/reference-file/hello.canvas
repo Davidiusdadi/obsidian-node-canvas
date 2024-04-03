@@ -1,8 +1,8 @@
 {
 	"nodes":[
-		{"id":"5f0a8189e7c61cfa","x":-433,"y":-360,"width":250,"height":60,"type":"text","text":"start"},
-		{"id":"9948456fef2a5392","x":-501,"y":-180,"width":387,"height":160,"type":"file","file":"tutorial/reference-file/log-hello.md"},
-		{"id":"23ff237737797edf","x":-140,"y":-330,"width":260,"height":110,"color":"6","type":"text","text":"log-hello here is a reference to an external file"}
+		{"id":"5f0a8189e7c61cfa","type":"text","text":"start","x":-433,"y":-360,"width":250,"height":60},
+		{"id":"9948456fef2a5392","type":"file","file":"tutorial/reference-file/log-hello.md","x":-501,"y":-180,"width":361,"height":220},
+		{"id":"23ff237737797edf","type":"text","text":"log-hello here is a reference to an external file","x":-140,"y":-330,"width":260,"height":110,"color":"6"}
 	],
 	"edges":[
 		{"id":"dc64b5c24ca87dbd","fromNode":"5f0a8189e7c61cfa","fromSide":"bottom","toNode":"9948456fef2a5392","toSide":"top"}
