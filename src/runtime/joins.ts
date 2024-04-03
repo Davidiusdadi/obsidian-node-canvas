@@ -59,7 +59,8 @@ export class InputsFilterJoiner {
         this.ctx.updateInput(new_inputs)
         this.ctx.updateState(new_state)
         this.completed = 'aggregate'
-        return Object.assign(() => this.ctx.input, this.resultAPI('input'))
+        const res =  Object.assign(() => this.ctx.input, this.resultAPI('input'))
+        return res
     }
 
     private innerJoinFilter(field: 'state' | 'input', join_on_field: string | null | undefined) {
@@ -106,13 +107,13 @@ export class InputsFilterJoiner {
         return this.resultAPI(field)
     }
 
-    joinOnState(field?: string) {
+    zipOnState(field?: string) {
         this.guardJoinOrAggregateStillPossible()
         this.guardInnerJoinReady()
         return this.innerJoinFilter('state', field)
     }
 
-    joinOnInput(field?: string) {
+    zipOnInput(field?: string) {
         this.guardJoinOrAggregateStillPossible()
         this.guardInnerJoinReady()
         return this.innerJoinFilter('input', field)
@@ -131,11 +132,11 @@ export class InputsFilterJoiner {
     get inner() {
         return {
             input: (value: any) => {
-                this.joinOnInput(value)
+                this.zipOnInput(value)
                 return this.resultAPI('input')
             },
             state: (value: any) => {
-                this.joinOnState(value)
+                this.zipOnState(value)
                 return this.resultAPI('state')
 
             },

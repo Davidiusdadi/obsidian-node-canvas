@@ -18,8 +18,8 @@ ctx.updateState = (new_state) => {
     ctx.state = new_state;
 };
 
-const joinOnState = this.join.joinOnState;
-const joinOnInput = this.join.joinOnInput;
+const zipOnState = this.join.zipOnState.bind(this.join);
+const zipOnInput = this.join.zipOnInput.bind(this.join);
 const aggregate = () => this.join.aggregate;
 
 
