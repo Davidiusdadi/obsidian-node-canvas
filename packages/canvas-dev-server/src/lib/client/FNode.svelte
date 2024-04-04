@@ -60,10 +60,14 @@
     style:height={Intededheight}
     style:maxWidth={Intededwidth}
     style:maxHeight={Intededheight}
-    style="background: whitesmoke; overflow: hidden"
+    class="border-2 border-gray rounded-lg bg-white overflow-y-auto"
 >
 
-       {@html text}
+    <div class="prose p-5 whitespace-pre-wrap">
+
+        {@html text}
+    </div>
+
 
 
 
