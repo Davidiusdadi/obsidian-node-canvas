@@ -1,14 +1,15 @@
 <script lang="ts">
-    import {Handle, type NodeProps, Position} from '@xyflow/svelte';
+    import {Handle, type NodeProps, Position, type Node} from '@xyflow/svelte';
     import type {ONode} from "canvas-engine/src/compile/canvas-node-transform"
-    import type {FNode} from "$lib/store"
     import {mdToHtml} from "$lib/md-to-html"
+    import {color} from "$lib/color"
+    import Color from "color"
 
 
     //export let data: ONode;
 
 
-    type $$Props = NodeProps<FNode>;
+    type $$Props = NodeProps<Node<ONode>>;
 
     export let id: $$Props['id'];
     id;
@@ -58,9 +59,9 @@
 <div
     style:width={Intededwidth}
     style:height={Intededheight}
-    style:maxWidth={Intededwidth}
-    style:maxHeight={Intededheight}
     class="border-2 border-gray rounded-lg bg-white overflow-y-auto"
+    style:border-color={color(data.original.color)}
+    style:background-color={Color(color(data.original.color)).lighten(0.74).hex()}
 >
 
     <div class="prose p-4 whitespace-pre-wrap">

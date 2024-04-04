@@ -3,8 +3,9 @@ import {browser} from "$app/environment"
 import type {DMsgCanvas} from "canvas-engine/src/runtime/dev-server/server"
 import _ from "lodash"
 import type {ONode} from "canvas-engine/src/compile/canvas-node-transform"
-import type {Edge, Node} from "@xyflow/svelte"
+import {type Edge, type Node, Position} from "@xyflow/svelte"
 import {MarkerType} from "@xyflow/svelte"
+import {color} from "$lib/color"
 
 
 export const nodes = writable<Node<ONode>[]>([]);
@@ -34,7 +35,7 @@ function startClient() {
                     target: edge.to,
                     sourceHandle: `${edge.from}-${edge.orginal.fromSide!}-source`,
                     targetHandle: `${edge.to}-${edge.orginal.toSide!}-target`,
-                    style: ' stroke-width: 1px; ',
+                    style: ` stroke-width: 2px; stroke: ${color(edge.orginal.color)};`,
                     label: edge.orginal.label,
                     labelStyle: 'font-size: 16px; background-color: white; padding: 2px; border-radius: 4px;',
                     deletable: false,
@@ -43,21 +44,19 @@ function startClient() {
 
                 if(edge.orginal.fromEnd === 'arrow') {
                     e.markerStart = {
-                        type: MarkerType.Arrow,
-                        height: 10,
-                        width: 10,
-                        strokeWidth: 40,
-                        color: 'black'
+                        type: MarkerType.ArrowClosed,
+                        height: 15,
+                        width: 15,
+                        color: color(edge.orginal.color)
 
                     }
                 }
                 if(edge.orginal.toEnd === 'arrow') {
                     e.markerEnd = {
-                        type: MarkerType.Arrow,
-                        height: 30,
-                        width: 30,
-                        strokeWidth: 2,
-
+                        type: MarkerType.ArrowClosed,
+                        height: 15,
+                        width: 15,
+                        color: color(edge.orginal.color)
                     }
                 }
                 new_edges.push(e)
@@ -68,7 +67,10 @@ function startClient() {
                 position: {x: node.original.x, y: node.original.y},
                 data: node,
                 draggable: false,
-                deletable: false
+                //origin: [ 0.5, 0.5],
+                deletable: false,
+                width: node.original.width,
+                height: node.original.height,
             } satisfies Node<ONode>
         })
 
