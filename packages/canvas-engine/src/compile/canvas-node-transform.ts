@@ -9,6 +9,15 @@ import {ExecutionContext} from "./types"
 import {NodeCompiler} from "./template"
 
 
+const ZPlacement = z.object({
+    x: z.number(),
+    y: z.number(),
+    width: z.number(),
+    height: z.number()
+})
+
+type Placement = z.output<typeof ZPlacement> & Record<string, any>
+
 const ZBaseNode = z.object({
     id: z.string(),
     edges: z.array(ZEdge).default([]),
@@ -16,6 +25,7 @@ const ZBaseNode = z.object({
         .transform((fn) => {
             return ((ctx, input) => input) satisfies Fn
         }),
+
 }).passthrough()
 
 const ZNodeStart = ZBaseNode.extend({
@@ -27,7 +37,7 @@ const ZNodeStart = ZBaseNode.extend({
         type: 'start' as const,
         edges: v.edges,
         fn: v.fn,
-        original: v as object
+        original: v as any as Placement
     }
 })
 
@@ -43,7 +53,7 @@ const ZCodeNode = ZBaseNode.extend({
         code: v.value,
         lang: v.lang,
         fn: v.fn,
-        original: v as object,
+        original: v as any as Placement,
         compiler: undefined as NodeCompiler | undefined
     }
 })
@@ -59,7 +69,7 @@ const ZNodeUrl = ZBaseNode.extend({
         fn: () => {
             return v.url
         },
-        original: v as object
+        original: v as any as Placement
     }
 })
 
@@ -74,7 +84,7 @@ const ZText = ZBaseNode.extend({
         code: v.text,
         edges: v.edges,
         fn: v.fn,
-        original: v as object
+        original: v as any as Placement
     }
 })
 
@@ -88,7 +98,7 @@ const ZGroup = ZBaseNode.extend({
         type: 'group' as const,
         edges: v.edges,
         fn: v.fn,
-        original: v as object,
+        original: v as any as Placement,
     }
 })
 
@@ -103,7 +113,7 @@ const ZFile = ZBaseNode.extend({
         file: v.file,
         edges: v.edges,
         fn: v.fn,
-        original: v as object
+        original: v as any as Placement
     }
 })
 

@@ -1,56 +1,11 @@
 {
-  "name": "crawl",
+  "name": "workspace",
   "version": "1.0.0",
-  "main": "index.ts",
-  "license": "private",
-  "private": true,
-  "type": "commonjs",
+  "private": "true",
   "scripts": {
-    "build": "esbuild src/main.ts --bundle --loader:.ts=ts --platform=node \"--external:@babel/preset-typescript/*\" --outfile=build/main.js --sourcemap",
-    "dev": "yarn -s build && env $(cat .env) node build/main.js",
-    "dev:inspect": "yarn -s build && env $(cat .env) node --inspect-brk build/main.js",
-    "dev:inspect-brk": "yarn -s build && env $(cat .env) node --inspect-brk build/main.js"
+    "dev": "env $(cat .env) yarn -s workspace canvas-engine run dev"
   },
-  "dependencies": {
-    "@directus/sdk": "^15.0.3",
-    "@mozilla/readability": "^0.5.0",
-    "@trbn/jsoncanvas": "^1.0.6",
-    "@types/jsdom": "^21.1.6",
-    "@types/node": "^20.11.30",
-    "@types/nunjucks": "^3.2.6",
-    "@types/yargs": "^17.0.32",
-    "axios": "^1.6.8",
-    "canvas": "^2.11.2",
-    "chalk": "^5.3.0",
-    "cheerio": "^1.0.0-rc.12",
-    "chokidar": "^3.6.0",
-    "esbuild": "^0.20.2",
-    "gray-matter": "^4.0.3",
-    "jsdom": "^24.0.0",
-    "langchain": "^0.1.28",
-    "lodash": "^4.17.21",
-    "nunjucks": "^3.2.4",
-    "obsidian-vault-parser": "git+https://github.com/Davidiusdadi/obsidian-vault-parser.git#main",
-    "openai": "^4.29.2",
-    "photon-geocoder": "^1.0.1",
-    "playwright": "^1.42.1",
-    "puppeteer": "^22.6.1",
-    "remark-parse": "^11.0.0",
-    "ts-node": "^10.9.2",
-    "tsne-js": "^1.0.3",
-    "tsneez": "^0.9.3",
-    "typescript": "^5.4.3",
-    "unified": "^11.0.4",
-    "unist-util-visit": "^5.0.0",
-    "yaml": "^2.4.1",
-    "yargs": "^17.7.2",
-    "youtube-transcript": "^1.1.0",
-    "youtubei.js": "^9.1.0",
-    "zod": "^3.22.4"
-  },
-  "devDependencies": {
-    "@swc/cli": "^0.3.10",
-    "@types/lodash": "^4.17.0",
-    "sucrase": "^3.35.0"
-  }
+  "workspaces": [
+    "packages/*"
+  ]
 }

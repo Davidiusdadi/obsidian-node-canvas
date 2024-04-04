@@ -130,6 +130,8 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
             }
         }
 
+        onode.original = cnode
+
 
         onode_data.set(cnode.id, onode)
 

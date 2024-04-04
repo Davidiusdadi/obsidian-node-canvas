@@ -1,17 +1,18 @@
 import {z} from "zod"
 
+const zEdgeSide = z.enum(['top', 'bottom', 'left', 'right'])
 const zEdgeEnd = z.enum(['none', 'arrow'])
 export const ZEdge = z.object({
     id: z.string(),
     fromNode: z.string(),
-    //fromSide: zEdgeSide.optional(),
+    fromSide: zEdgeSide.optional(),
     fromEnd: zEdgeEnd.default('none'),
     toNode: z.string(),
-    //toSide: zEdgeSide.optional(),
+    toSide: zEdgeSide.optional(),
     toEnd: zEdgeEnd.default('arrow'),
-    //color: z.string().optional(),
+    color: z.string().optional(),
     label: z.string().optional()
-}).strip().transform((v) => {
+}).passthrough().transform((v) => {
     let direction: 'forward' | 'backward' | 'none' | 'bi' = 'none'
     if (v.fromEnd === 'arrow' && v.toEnd === 'none') {
         direction = 'backward'
@@ -27,7 +28,8 @@ export const ZEdge = z.object({
         from: v.fromNode,
         to: v.toNode,
         label: v.label,
-        direction
+        direction,
+        orginal: v
     }
 })
 export type OEdge = z.output<typeof ZEdge>
