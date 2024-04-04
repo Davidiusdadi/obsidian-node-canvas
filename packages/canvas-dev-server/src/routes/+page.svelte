@@ -14,7 +14,7 @@
 </script>
 
 <main>
-    <SvelteFlow {nodeTypes} {nodes} {edges}>
+    <SvelteFlow {nodeTypes} {nodes} {edges} >
         <Background />
         <Controls />
     </SvelteFlow>

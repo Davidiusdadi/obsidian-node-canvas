@@ -63,22 +63,18 @@
     class="border-2 border-gray rounded-lg bg-white overflow-y-auto"
 >
 
-    <div class="prose p-5 whitespace-pre-wrap">
+    <div class="prose p-4 whitespace-pre-wrap">
 
         {@html text}
     </div>
 
+    <Handle type="source" style="opacity: 0;" id={`${id}-top-source`} position={Position.Top}/>
+    <Handle type="source" style="opacity: 0;"  id={`${id}-right-source`} position={Position.Right}/>
+    <Handle type="source" style="opacity: 0;"  id={`${id}-bottom-source`} position={Position.Bottom}/>
+    <Handle type="source" style="opacity: 0;"  id={`${id}-left-source`} position={Position.Left}/>
 
-
-
-    <Handle type="target" position={Position.Left}/>
-    <Handle type="source" id={`${id}-top-source`} position={Position.Top}/>
-    <Handle type="source" id={`${id}-right-source`} position={Position.Right}/>
-    <Handle type="source" id={`${id}-bottom-source`} position={Position.Bottom}/>
-    <Handle type="source" id={`${id}-left-source`} position={Position.Left}/>
-
-    <Handle type="target" id={`${id}-top-target`} position={Position.Top}/>
-    <Handle type="target" id={`${id}-right-target`} position={Position.Right}/>
-    <Handle type="target" id={`${id}-bottom-target`} position={Position.Bottom}/>
-    <Handle type="target" id={`${id}-left-target`} position={Position.Left}/>
+    <Handle type="target" style="opacity: 0;"  id={`${id}-top-target`} position={Position.Top}/>
+    <Handle type="target" style="opacity: 0;"  id={`${id}-right-target`} position={Position.Right}/>
+    <Handle type="target" style="opacity: 0;"  id={`${id}-bottom-target`} position={Position.Bottom}/>
+    <Handle type="target" style="opacity: 0;"  id={`${id}-left-target`} position={Position.Left}/>
 </div>
