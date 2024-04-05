@@ -15,11 +15,11 @@ import code_node_compilers from "../node_library"
 import {loadFileNode} from "./file-loader"
 
 /** @trbn/jsoncanvas types are not complete - these are:  */
-export type JSONCanvasNode = LinkNode | TextNode | GenericNode & {
+export type JSONCanvasNode = (LinkNode | TextNode | GenericNode & {
     type: 'file'
     file: string
-} | GroupNode & {
-    id: string
+} | (GenericNode & GroupNode)) & {
+    color?: undefined
 }
 
 /**

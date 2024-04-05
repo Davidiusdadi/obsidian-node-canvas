@@ -20,3 +20,8 @@ body {
     color: #3a3a3a;
     border-radius: 3px;
 }
+
+.prose :where(code):not(:where([class~="not-prose"],[class~="not-prose"] *))::before,
+.prose :where(code):not(:where([class~="not-prose"],[class~="not-prose"] *))::after {
+    content: "" !important;
+}

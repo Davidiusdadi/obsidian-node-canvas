@@ -1,12 +1,16 @@
 <script lang="ts">
 
-    import {SvelteFlow, Background, Controls, MiniMap, type FitViewOptions} from '@xyflow/svelte';
-
+    import {Background, Controls, type FitViewOptions, MiniMap, type Node, SvelteFlow} from '@xyflow/svelte';
     import '@xyflow/svelte/dist/style.css';
 
-    import {nodes, edges} from '$lib/store';
+    import {edges, nodes} from '$lib/store';
     import FNode from "$lib/client/FNode.svelte"
     import {get} from "svelte/store"
+    import type {ONode} from "canvas-engine/src/compile/canvas-node-transform"
+    import NodeContent from "$lib/client/NodeContent.svelte"
+    import {Tab, TabGroup} from "@skeletonlabs/skeleton"
+    import {color} from "$lib/color"
+    import Color from "color"
 
     export const nodeTypes = {
         'FNode': FNode
@@ -24,14 +28,58 @@
         }),
     } satisfies FitViewOptions
 
+
+    let tabSet: number = 1;
+    let selectedNode: Node<ONode> | null = null
+    const nodeclick = (e: CustomEvent<{ event: MouseEvent | TouchEvent; node: Node<ONode> }>) => {
+        selectedNode = e.detail.node
+        console.log(selectedNode)
+    }
+
 </script>
 
-<main>
-    <SvelteFlow {nodeTypes} {nodes} {edges} fitView={true} {fitViewOptions}  >
-        <Background patternColor="#aaa" gap={16} />
-        <Controls />
-        <MiniMap zoomable pannable height={120} />
+<main class="flex bg-surface-100">
+    <SvelteFlow
+        {nodeTypes}
+        {nodes}
+        {edges}
+        fitView={true}
+        {fitViewOptions}
+        on:nodeclick={nodeclick}
+    >
+        <Background patternColor="#aaa" gap={16}/>
+        <Controls/>
+        <MiniMap zoomable pannable height={120}/>
     </SvelteFlow>
+    <div class="w-[500px] origin-top-left">
+        <TabGroup>
+            <Tab bind:group={tabSet} name="tab2" value={1}>Definition</Tab>
+            <Tab bind:group={tabSet} name="tab3" value={2}>Logs</Tab>
+            <Tab bind:group={tabSet} name="tab3" value={3}>Input</Tab>
+            <svelte:fragment slot="panel">
+                {#if tabSet === 1}
+                    {#if selectedNode}
+                        {@const data = selectedNode.data}
+                        <div
+                            class="border-2 border-gray rounded-lg bg-white overflow-y-auto"
+                            style:border-color={color(data.original.color)}
+                            style:background-color={Color(color(data.original.color)).lighten(0.74).hex()}
+                            style="zoom: 0.7"
+                        >
+                            <NodeContent node={data }/>
+                        </div>
+
+                    {:else}
+                        <p>Select a node</p>
+                    {/if}
+                {:else if tabSet === 2}
+                    TODO: show logs
+                {:else if tabSet ===3}
+                    TODO: show input
+                {/if}
+            </svelte:fragment>
+        </TabGroup>
+    </div>
 </main>
 
 <style>

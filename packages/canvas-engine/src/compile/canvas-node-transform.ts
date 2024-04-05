@@ -7,16 +7,10 @@ import {Fn} from "../runtime/runtime-types"
 
 import {ExecutionContext} from "./types"
 import {NodeCompiler} from "./template"
+import {JSONCanvasNode} from "./parse-canvas"
 
 
-const ZPlacement = z.object({
-    x: z.number(),
-    y: z.number(),
-    width: z.number(),
-    height: z.number()
-})
-
-type Placement = z.output<typeof ZPlacement> & Record<string, any>
+type Placement = JSONCanvasNode
 
 const ZBaseNode = z.object({
     id: z.string(),
