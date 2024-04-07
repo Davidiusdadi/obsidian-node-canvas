@@ -10,11 +10,13 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
   },
   "devDependencies": {
+    "@iconify/svelte": "^3.1.6",
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "@types/color": "^3.0.6",
     "@types/node": "^20.12.4",
+    "@types/ws": "^8.5.10",
     "autoprefixer": "^10.4.16",
     "color": "^4.2.3",
     "postcss": "^8.4.32",
@@ -35,6 +37,7 @@
     "@types/ws": "^8.5.10",
     "@xyflow/svelte": "^0.0.40",
     "canvas-engine": "*",
+    "flatted": "^3.3.1",
     "lodash": "^4.17.21",
     "prismjs": "^1.29.0",
     "rehype": "^13.0.1",

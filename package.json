@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": "true",
   "scripts": {
-    "dev": "env $(cat .env) yarn -s workspace canvas-engine run dev"
+    "dev": "env $(cat .env) yarn -s workspace canvas-engine run dev",
+    "dev:inspect": "env $(cat .env) yarn -s workspace canvas-engine run dev:inspect",
+    "dev:inspect-brk": "env $(cat .env) yarn -s workspace canvas-engine run dev:inspect-brk"
   },
   "workspaces": [
     "packages/*"

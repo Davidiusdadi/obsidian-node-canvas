@@ -33,7 +33,7 @@ export const yaml_to_fn = (yaml_string: string, context: ExecutionContext) => {
     const raw_input = yaml_string.replaceAll('\t', '    ')
     const parsed_yaml = yaml.parse(raw_input)
 
-    const fn: Fn = (ctx, input) => {
+    const fn: Fn = (ctx) => {
         const interpolated = transformObjectStrings(parsed_yaml, (v) => {
             return template_render(v, ctx)
         })

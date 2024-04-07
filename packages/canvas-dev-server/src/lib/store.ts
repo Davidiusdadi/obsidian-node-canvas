@@ -1,22 +1,54 @@
-import {writable} from "svelte/store"
+import {get, writable} from "svelte/store"
 import {browser} from "$app/environment"
-import type {DMsgCanvas} from "canvas-engine/src/runtime/dev-server/server"
 import _ from "lodash"
 import type {ONode} from "canvas-engine/src/compile/canvas-node-transform"
-import {type Edge, type Node, Position} from "@xyflow/svelte"
-import {MarkerType} from "@xyflow/svelte"
+import {type Edge, MarkerType, type Node} from "@xyflow/svelte"
 import {color} from "$lib/color"
+import {
+    type MsgInspector2Runner,
+    type MsgRunner2Inspector,
+    type zRFrame
+} from "canvas-engine/src/runtime/inspection/protocol"
+import * as Flatted from 'flatted'
 
 
 export const nodes = writable<Node<ONode>[]>([]);
 export const edges = writable<Edge[]>([]);
+export const stack = writable<zRFrame[]>([])
+export const this_step_frame = writable<zRFrame | null>(null)
 
+let ws: WebSocket
+
+export const sendToRunner = (msg: MsgInspector2Runner) => {
+    console.log('Sending:', msg)
+    ws.send(Flatted.stringify(msg))
+}
+
+export const last_message = writable<MsgRunner2Inspector>()
 
 function startClient() {
-    const ws = new WebSocket('ws://localhost:9763');
+    ws = new WebSocket('ws://localhost:9763');
 
     ws.onmessage = function (event) {
-        const data: DMsgCanvas = JSON.parse(event.data);
+        const data: MsgRunner2Inspector = Flatted.parse(event.data);
+
+        console.log('Received:', data)
+
+        last_message.set(data)
+        if (data.type !== 'canvas') {
+
+            if (data.type === 'frame-new') {
+                stack.update((s) => [...s, data.frame])
+            } else if (data.type === 'frame-complete') {
+                stack.update((s) => s.filter((f) => f.id !== data.frame_id))
+            } else if (data.type === 'runner-state') {
+                console.log('Runner state:', data.state)
+            } else if (data.type === 'frame-step') {
+                this_step_frame.set(get(stack).find((f) => f.id === data.frame_id) || null)
+            }
+
+            return
+        }
         console.log('Received:', data)
         if (!data.canvas) {
             console.log('No canvas data')
@@ -42,7 +74,7 @@ function startClient() {
                     type: 'bezier',
                 }
 
-                if(edge.orginal.fromEnd === 'arrow') {
+                if (edge.orginal.fromEnd === 'arrow') {
                     e.markerStart = {
                         type: MarkerType.ArrowClosed,
                         height: 15,
@@ -51,7 +83,7 @@ function startClient() {
 
                     }
                 }
-                if(edge.orginal.toEnd === 'arrow') {
+                if (edge.orginal.toEnd === 'arrow') {
                     e.markerEnd = {
                         type: MarkerType.ArrowClosed,
                         height: 15,

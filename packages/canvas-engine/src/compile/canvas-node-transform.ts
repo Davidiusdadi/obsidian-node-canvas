@@ -8,6 +8,7 @@ import {Fn} from "../runtime/runtime-types"
 import {ExecutionContext} from "./types"
 import {NodeCompiler} from "./template"
 import {JSONCanvasNode} from "./parse-canvas"
+import {ExecutableCanvas} from "../runtime/ExecutableCanvas"
 
 
 type Placement = JSONCanvasNode
@@ -17,8 +18,9 @@ const ZBaseNode = z.object({
     edges: z.array(ZEdge).default([]),
     fn: z.undefined().optional()
         .transform((fn) => {
-            return ((ctx, input) => input) satisfies Fn
+            return ((ctx) => ctx.input) satisfies Fn
         }),
+    comment: z.string().optional()
 
 }).passthrough()
 
@@ -31,6 +33,7 @@ const ZNodeStart = ZBaseNode.extend({
         type: 'start' as const,
         edges: v.edges,
         fn: v.fn,
+        comment: v.comment,
         original: v as any as Placement
     }
 })
@@ -47,6 +50,7 @@ const ZCodeNode = ZBaseNode.extend({
         code: v.value,
         lang: v.lang,
         fn: v.fn,
+        comment: v.comment,
         original: v as any as Placement,
         compiler: undefined as NodeCompiler | undefined
     }
@@ -60,6 +64,7 @@ const ZNodeUrl = ZBaseNode.extend({
         id: v.id,
         type: 'url' as const,
         edges: v.edges,
+        comment: v.comment,
         fn: () => {
             return v.url
         },
@@ -77,6 +82,7 @@ const ZText = ZBaseNode.extend({
         type: 'text' as const,
         code: v.text,
         edges: v.edges,
+        comment: v.comment,
         fn: v.fn,
         original: v as any as Placement
     }
@@ -91,6 +97,7 @@ const ZGroup = ZBaseNode.extend({
         id: v.id,
         type: 'group' as const,
         edges: v.edges,
+        comment: v.comment,
         fn: v.fn,
         original: v as any as Placement,
     }
@@ -106,8 +113,10 @@ const ZFile = ZBaseNode.extend({
         type: 'file' as const,
         file: v.file,
         edges: v.edges,
+        comment: v.comment,
         fn: v.fn,
-        original: v as any as Placement
+        original: v as any as Placement,
+        canvas:  undefined as ExecutableCanvas | undefined
     }
 })
 

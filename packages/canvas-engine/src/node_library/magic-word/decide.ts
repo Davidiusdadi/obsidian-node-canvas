@@ -8,7 +8,7 @@ export default {
     lang: 'decide',
     magic_word: true,
     compile: async (code) => {
-        return async (ctx, input) => {
+        return async (ctx) => {
 
             const final_prompt = template_render(code, ctx).trim()
             logger.info(`${chalk.green('decide')} prompt: `, chalk.gray(final_prompt))
@@ -22,7 +22,7 @@ export default {
                 ]
             }, ctx)).response?.trim()
             logger.info(`${chalk.green('decide')} response: `, chalk.magenta(resp))
-            ctx.emit(resp?.toLowerCase() ?? 'error', input)
+            ctx.emit(resp?.toLowerCase() ?? 'error', ctx.input)
             return resp
         }
     }

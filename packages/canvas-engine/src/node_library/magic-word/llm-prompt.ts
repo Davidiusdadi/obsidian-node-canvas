@@ -8,7 +8,7 @@ export default {
     lang: 'llm-prompt',
     magic_word: true,
     compile: async (code) => {
-        return async (ctx, input) => {
+        return async (ctx) => {
             const final_prompt = template_render(code, ctx).trim()
             logger.debug(`${chalk.green('llm-prompt')}: `, chalk.gray(final_prompt))
             const resp = (await gpt_runner_generic({

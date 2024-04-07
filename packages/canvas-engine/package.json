@@ -8,8 +8,8 @@
   "scripts": {
     "build": "esbuild src/main.ts --bundle --loader:.ts=ts --platform=node \"--external:@babel/preset-typescript/*\" --outfile=build/main.js --sourcemap",
     "dev": "this_workspace=`pwd`; yarn -s build && cd ../.. && node \"$this_workspace\"/build/main.js",
-    "dev:inspect": "yarn -s build && node --inspect build/main.js",
-    "dev:inspect-brk": "yarn -s build && env $(cat .env) node --inspect-brk build/main.js"
+    "dev:inspect": "this_workspace=`pwd`; yarn -s build && cd ../.. && node --inspect \"$this_workspace\"/build/main.js",
+    "dev:inspect-brk": "this_workspace=`pwd`; yarn -s build && cd ../.. && && node --inspect-brk  \"$this_workspace\"/build/main.js"
   },
   "dependencies": {
     "@directus/sdk": "^15.0.3",
@@ -25,6 +25,7 @@
     "cheerio": "^1.0.0-rc.12",
     "chokidar": "^3.6.0",
     "esbuild": "^0.20.2",
+    "flatted": "^3.3.1",
     "gray-matter": "^4.0.3",
     "jsdom": "^24.0.0",
     "langchain": "^0.1.28",

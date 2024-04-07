@@ -1,8 +1,10 @@
 import {ONode} from "../compile/canvas-node-transform"
 import {OEdge} from "../compile/canvas-edge-transform"
 import {InputsFilterJoiner} from "./joins"
-import {ParsedCanvas} from "../types"
 import {ExecutableCanvas} from "./ExecutableCanvas"
+import {z} from "zod"
+import {zz} from "./helper"
+import {MsgRunner2Inspector, runner2inspector} from "./inspection/protocol"
 
 export type CTX = {
     emit: (label: string, value: any) => void
@@ -15,23 +17,35 @@ export type CTX = {
     updateInput: (new_input: any) => void
     updateState: (new_state: any) => void,
     injectFrame: (frame: StackFrame) => void
+    introspection?: Introspection
+    globals: Record<string | symbol, any>
 } & Record<string, any>
 
-export interface StackFrame {
-    node: ONode,
-    input: any,
-    state: any,
-    edge: null | OEdge
-    is_aggregating: boolean
-    chart: ExecutableCanvas
-    // will be set when the frame is being invoked
-    ctx?: CTX
+
+export type Introspection = {
+    inform: (msg: z.input<typeof runner2inspector>) => Promise<void> | void
+    waitForInput(): Promise<any>
+
+    installIntrospections: (canvas: ExecutableCanvas) => void
 }
+
+export const zStackFrame = z.object({
+    id: z.optional(z.number()),
+    node: zz<ONode>(),
+    input: z.any(),
+    state: z.any(),
+    edge: z.nullable(zz<OEdge>()),
+    is_aggregating: z.boolean(),
+    chart: zz<ExecutableCanvas>(),
+    ctx: zz<CTX>().optional()
+})
+
+export type StackFrame = z.output<typeof zStackFrame>
 
 export type FnThis = {
     _invocations: Record<string, StackFrame[]>
     // join it will always be set during node execution
     join?: InputsFilterJoiner
 } & Record<string, any>
-export type Fn = (this: FnThis, ctx: CTX, input: any) => any | Promise<any>
+export type Fn = (this: FnThis, ctx: CTX) => any | Promise<any>
 

@@ -4,12 +4,13 @@ import {ParsedCanvas} from "../types"
 
 
 export class ExecutableCanvas {
+
     node_this_data = new Map<string, FnThis>()
     node_ancestors = new Map<string, Set<string>>()
     nodes: ONode[]
     node_map: Map<string, ONode>
 
-    constructor(node_data: ParsedCanvas) {
+    constructor( public file: string, node_data: ParsedCanvas) {
         const instr = [...node_data.values()]
         this.nodes = instr
         this.node_map = node_data

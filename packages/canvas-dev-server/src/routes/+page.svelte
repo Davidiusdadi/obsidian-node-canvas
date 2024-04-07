@@ -3,7 +3,7 @@
     import {Background, Controls, type FitViewOptions, MiniMap, type Node, SvelteFlow} from '@xyflow/svelte';
     import '@xyflow/svelte/dist/style.css';
 
-    import {edges, nodes} from '$lib/store';
+    import {edges, last_message, nodes, sendToRunner} from '$lib/store';
     import FNode from "$lib/client/FNode.svelte"
     import {get} from "svelte/store"
     import type {ONode} from "canvas-engine/src/compile/canvas-node-transform"
@@ -11,6 +11,7 @@
     import {Tab, TabGroup} from "@skeletonlabs/skeleton"
     import {color} from "$lib/color"
     import Color from "color"
+    import Icon from "@iconify/svelte"
 
     export const nodeTypes = {
         'FNode': FNode
@@ -36,6 +37,14 @@
         console.log(selectedNode)
     }
 
+
+    function debug_action_play() {
+        sendToRunner({
+            type: 'debug-action',
+            action: 'fast-forward'
+        })
+    }
+
 </script>
 
 <main class="flex bg-surface-100">
@@ -52,6 +61,31 @@
         <MiniMap zoomable pannable height={120}/>
     </SvelteFlow>
     <div class="w-[500px] origin-top-left">
+
+        <div class="absolute left-1.5 top-1.5">
+            <div class="btn-group variant-filled">
+                <!--
+                           <button> <Icon icon="material-symbols:fast-forward-rounded" /></button>
+                           <button> <Icon icon="material-symbols:pause" /></button>-->
+                <button
+                    on:click={() =>  sendToRunner({
+                        type: 'debug-action',
+                        action: 'fast-forward'
+                    })}
+                >
+                    <Icon icon="mdi:play"/>
+                </button>
+                <button
+                    on:click={() =>  sendToRunner({
+                        type: 'debug-action',
+                        action: 'step'
+                    })}
+                >
+                    <Icon icon="material-symbols:step-over-rounded"/>
+                </button>
+            </div>
+        </div>
+
         <TabGroup>
             <Tab bind:group={tabSet} name="tab2" value={1}>Definition</Tab>
             <Tab bind:group={tabSet} name="tab3" value={2}>Logs</Tab>
@@ -74,7 +108,8 @@
                     {/if}
                 {:else if tabSet === 2}
                     TODO: show logs
-                {:else if tabSet ===3}
+                    {JSON.stringify($last_message)}
+                {:else if tabSet === 3}
                     TODO: show input
                 {/if}
             </svelte:fragment>

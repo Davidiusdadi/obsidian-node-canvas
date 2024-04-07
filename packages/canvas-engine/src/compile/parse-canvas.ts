@@ -1,5 +1,4 @@
 import path from "node:path"
-import {writeFileSync} from "node:fs"
 import {ONode, preParseNode} from "./canvas-node-transform"
 import {readFile} from "fs/promises"
 import {GenericNode, GroupNode, JSONCanvas, LinkNode, TextNode} from '@trbn/jsoncanvas'
@@ -8,7 +7,6 @@ import {visit} from 'unist-util-visit'
 
 import {logger} from "../globals"
 import {ZEdge} from "./canvas-edge-transform"
-import {Fn} from "../runtime/runtime-types"
 import {parseMd} from "./md-parse"
 import {ExecutionContext} from "./types"
 import code_node_compilers from "../node_library"
@@ -29,6 +27,7 @@ export type JSONCanvasNode = (LinkNode | TextNode | GenericNode & {
  * - assign onode.edges
  **/
 export async function parseCanvas(canvas_path: string, config: GlobalContext): Promise<ParsedCanvas> {
+
     let canvas_path_full = path.join(config.vault_dir, canvas_path)
     let file_contents = await readFile(canvas_path_full, 'utf8')
     const canvas_data = JSONCanvas.fromString(file_contents)
@@ -51,7 +50,7 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
         onode = preParseNode(cnode as any, context)
 
         if (onode.type === 'file') {
-            const loaded_node = await loadFileNode(onode, context)
+            const loaded_node = await loadFileNode(onode, context, config)
             if (loaded_node.type === 'text') {
                 onode = preParseNode({
                     type: 'text',
@@ -122,11 +121,12 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
             logger.debug('ignoring node:', cnode)
             onode = {
                 id: cnode.id,
-                fn: (ctx, input) => input,
+                fn: (ctx) => ctx.input,
                 type: 'text',
                 code: cnode.type === 'text' ? cnode.text : '',
                 edges: [],
-                original: cnode
+                original: cnode,
+                comment: 'this node is not executable'
             }
         }
 

@@ -8,7 +8,8 @@ import chokidar from 'chokidar'
 import path from "node:path"
 import {existsSync} from "node:fs"
 import {ExecutableCanvas} from "./runtime/ExecutableCanvas"
-import {startDevServer} from "./runtime/dev-server/server"
+import {startDevServer} from "./runtime/inspection/server"
+import {GlobalContext} from "./types"
 
 
 const args = yargs(hideBin(process.argv))
@@ -107,19 +108,40 @@ let stage = 'parsing';
 
 async function parseAndRun() {
     try {
-        const node_data = await parseCanvas(canvas_path, {
-            vault_dir
-        })
-        const canvas = new ExecutableCanvas(node_data)
-        if (should_start_server) {
-            const server = startDevServer()
-            server.setCanvas(canvas)
+
+        let global_context: GlobalContext = {
+            vault_dir,
+            loaded_files: {}
         }
 
+        let node_data = await parseCanvas(canvas_path, global_context)
+
         stage = 'runtime'
-        await execCanvas(canvas, {
-            vault_dir
-        })
+
+
+        if (should_start_server) {
+            const inspector = startDevServer()
+            while (true) {
+                global_context = {
+                    vault_dir,
+                    loaded_files: {}
+                }
+                node_data = await parseCanvas(canvas_path, global_context)
+                inspector.installGlobalIntrospections(global_context)
+
+                let canvas = new ExecutableCanvas(canvas_path, node_data)
+                inspector.setCanvas(canvas)
+
+                console.log('waiting for inspector to connect / (re)start...')
+                await global_context.introspection?.waitForInput()
+                await execCanvas(canvas, global_context)
+            }
+
+        } else {
+            await execCanvas(new ExecutableCanvas(canvas_path, node_data), global_context)
+        }
+
+
     } catch (e) {
         console.trace(e)
         console.log(`Error during ${chalk.red(stage)}: ${e}`)
