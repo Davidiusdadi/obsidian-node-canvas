@@ -10,7 +10,7 @@ export class ExecutableCanvas {
     nodes: ONode[]
     node_map: Map<string, ONode>
 
-    constructor( public file: string, node_data: ParsedCanvas) {
+    constructor(public file: string, node_data: ParsedCanvas) {
         const instr = [...node_data.values()]
         this.nodes = instr
         this.node_map = node_data

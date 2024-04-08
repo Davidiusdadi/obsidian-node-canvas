@@ -107,7 +107,7 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
         if (onode?.type === 'code') {
             for (const comp of code_node_compilers) {
                 if (comp.lang === onode.lang) {
-                    onode.fn = await comp.compile(onode.code, context)
+                    onode.fn = await comp.compile(onode.code, context, config)
                     onode.compiler = comp
                     break
                 }

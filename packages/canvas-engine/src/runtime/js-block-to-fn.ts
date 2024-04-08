@@ -1,7 +1,8 @@
 import {Fn} from "./runtime-types"
 import chalk from "chalk"
+import {GlobalContext} from "../types"
 
-export function js_to_fn(code: string): Fn {
+export function js_to_fn(code: string, context: GlobalContext): Fn {
     const instr_code = `
 
 let state = ctx.state;    
@@ -32,7 +33,9 @@ const emit = (...args) => {
 // provide easy to sleep function
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+// node code start
 ${code}
+// node code end
 
 })().finally(() => {
     ctx.state = state;

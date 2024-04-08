@@ -76,12 +76,11 @@ export const startDevServer = () => {
             canvas = c
         },
         installGlobalIntrospections: (context: GlobalContext) => {
+
             context.introspection = {
                 inform: async (msg) => {
                     const wire_msg = runner2inspector.parse(msg)
-                    console.log('Sending:', wire_msg)
-
-
+                    logger.info('Sending:', wire_msg)
 
 
                     const str = Flatted.stringify(wire_msg)

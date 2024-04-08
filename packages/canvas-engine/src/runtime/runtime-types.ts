@@ -5,6 +5,7 @@ import {ExecutableCanvas} from "./ExecutableCanvas"
 import {z} from "zod"
 import {zz} from "./helper"
 import {MsgRunner2Inspector, runner2inspector} from "./inspection/protocol"
+import { GlobalContext } from "../types"
 
 export type CTX = {
     emit: (label: string, value: any) => void
@@ -17,8 +18,7 @@ export type CTX = {
     updateInput: (new_input: any) => void
     updateState: (new_state: any) => void,
     injectFrame: (frame: StackFrame) => void
-    introspection?: Introspection
-    globals: Record<string | symbol, any>
+    gctx: GlobalContext
 } & Record<string, any>
 
 

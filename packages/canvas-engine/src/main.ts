@@ -126,8 +126,9 @@ async function parseAndRun() {
                     vault_dir,
                     loaded_files: {}
                 }
-                node_data = await parseCanvas(canvas_path, global_context)
                 inspector.installGlobalIntrospections(global_context)
+
+                node_data = await parseCanvas(canvas_path, global_context)
 
                 let canvas = new ExecutableCanvas(canvas_path, node_data)
                 inspector.setCanvas(canvas)

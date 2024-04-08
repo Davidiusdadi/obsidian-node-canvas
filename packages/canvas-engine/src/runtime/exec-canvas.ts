@@ -15,22 +15,16 @@ import {zRFrameComplete, zRFrameNew} from "./inspection/protocol"
  * This holds the main execution loop.
  * It receives fully parsed and configured nodes ready for execution.
  **/
-export async function execCanvas(inital_canvas: ExecutableCanvas, context: GlobalContext) {
+export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalContext) {
 
 
     let stack: StackFrame[] = []
     let frame_id = 0
 
-    const global_ctx = {
-        globals: globalThis,
-        introspection: context.introspection,
-    } satisfies Partial<CTX>
-
-    context.introspection?.installIntrospections(inital_canvas)
 
     const push_frame = (frame: StackFrame) => {
         stack.push(frame)
-        global_ctx.introspection?.inform({
+        gctx.introspection?.inform({
             type: 'frame-new',
             frame,
         } satisfies z.input<typeof zRFrameNew>)
@@ -96,13 +90,12 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, context: Globa
             // AND remove all other frames for that node (as they would also turn into aggregations)
             //stack = stack.filter((f) => f !== first_ready_aggregation && f.node.id !== first_ready_aggregation.node.id)
             _.remove(stack, (f) => f.node.id === first_ready_aggregation.node.id).forEach((f) => {
-                if(f !== frame) {
-                    global_ctx.introspection?.inform({
+                if (f !== frame) {
+                    gctx.introspection?.inform({
                         type: 'frame-complete',
                         frame_id: f.id!,
                     } satisfies z.input<typeof zRFrameComplete>)
                 }
-
             })
 
         } else {
@@ -129,7 +122,7 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, context: Globa
             edges: node_debug.edges.length
         })
 
-        await global_ctx.introspection?.inform({
+        await gctx.introspection?.inform({
             type: 'frame-step',
             frame_id: frame.id!,
         })
@@ -144,10 +137,9 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, context: Globa
             const this_data = frame.chart.node_this_data.get(node.id)!
 
             const ctx: CTX = {
-                ...global_ctx,
                 input: input,
                 state: state,
-                vault_dir: context.vault_dir,
+                vault_dir: gctx.vault_dir,
                 _this: this_data,
                 self_canvas_nodes: frame.chart,  // will be set during node execution
                 self_canvas_node: node, // will be set during node execution
@@ -160,7 +152,8 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, context: Globa
                         return edge.direction === 'forward' && edge.from === node.id && edge.label?.trim() === label
                     })
                     emit_along_edges(frame!, edges_label_out, emission)
-                }
+                },
+                gctx: gctx
             }
             frame.ctx = ctx
 
@@ -174,7 +167,7 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, context: Globa
 
                 logger.debug(`following edges: ${edges_default_out.length}`)
                 emit_along_edges(frame, edges_default_out, return_value)
-                await global_ctx.introspection?.inform({
+                await gctx.introspection?.inform({
                     type: 'frame-complete',
                     frame_id: frame.id!,
                 } satisfies z.input<typeof zRFrameComplete>)
@@ -186,7 +179,7 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, context: Globa
                         frame.is_aggregating = true
                         stack.unshift(frame)
                     } else {
-                        await global_ctx.introspection?.inform({
+                        await gctx.introspection?.inform({
                             type: 'frame-complete',
                             frame_id: frame.id!,
                         } satisfies z.input<typeof zRFrameComplete>)
@@ -200,10 +193,7 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, context: Globa
                 throw e
             }
         }
-
-
     }
-
 }
 
 
