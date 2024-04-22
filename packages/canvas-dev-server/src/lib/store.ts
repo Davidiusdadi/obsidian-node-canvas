@@ -16,6 +16,7 @@ export const nodes = writable<Node<ONode>[]>([]);
 export const edges = writable<Edge[]>([]);
 export const stack = writable<zRFrame[]>([])
 export const this_step_frame = writable<zRFrame | null>(null)
+export const messages = writable<MsgRunner2Inspector[]>([])
 
 let ws: WebSocket
 
@@ -45,6 +46,9 @@ function startClient() {
                 console.log('Runner state:', data.state)
             } else if (data.type === 'frame-step') {
                 this_step_frame.set(get(stack).find((f) => f.id === data.frame_id) || null)
+            } else {
+                // push on stack
+                messages.update((s) => [...s, data])
             }
 
             return

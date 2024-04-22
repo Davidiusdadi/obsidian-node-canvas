@@ -117,10 +117,7 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
 
 
         const {fn, ...node_debug} = node
-        logger.debug('executing node: ', {
-            ...node_debug,
-            edges: node_debug.edges.length
-        })
+        logger.debug('executing node: ', node.type, (node as any)?.code ?? '')
 
         await gctx.introspection?.inform({
             type: 'frame-step',
@@ -129,7 +126,24 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
 
 
         const edges_default_out = node.edges.filter((edge) => {
-            return edge.direction === 'forward' && edge.from === node.id && (edge.label?.trim() || '').length === 0
+            if (edge.direction !== 'forward') {
+                return false
+            }
+
+            if (edge.from === node.id && (edge.label?.trim() || '').length === 0) {
+                return true
+            }
+
+            const target_node = frame!.chart.node_map.get(edge.to)
+            if (!target_node) {
+                return false
+            }
+            if (target_node.type === 'file' && target_node.file.endsWith('.canvas')) {
+                return true
+            }
+
+
+            return false
         })
 
 
@@ -153,7 +167,8 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
                     })
                     emit_along_edges(frame!, edges_label_out, emission)
                 },
-                gctx: gctx
+                gctx: gctx,
+                frame
             }
             frame.ctx = ctx
 

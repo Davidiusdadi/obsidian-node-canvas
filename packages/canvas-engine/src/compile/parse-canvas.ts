@@ -72,8 +72,6 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
                 const magic_word = magic_word_check[2].toLowerCase()
                 const text = onode.code.substring(magic_word_check[1].length)
 
-                logger.debug('magic word:', magic_word, 'text:', text)
-
                 for (const comp of code_node_compilers) {
                     if (comp.magic_word && comp.lang === magic_word) {
                         onode = preParseNode({

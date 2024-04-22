@@ -18,7 +18,8 @@ export type CTX = {
     updateInput: (new_input: any) => void
     updateState: (new_state: any) => void,
     injectFrame: (frame: StackFrame) => void
-    gctx: GlobalContext
+    gctx: GlobalContext,
+    frame: StackFrame
 } & Record<string, any>
 
 

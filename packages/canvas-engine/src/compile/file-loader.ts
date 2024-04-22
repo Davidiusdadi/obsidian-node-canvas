@@ -23,9 +23,11 @@ export async function loadFileNode(node: FileNode, ectx: ExecutionContext, gctx:
     if (file.ext === '.canvas') {
         const canvas_blueprint = new ExecutableCanvas(node.file, await parseCanvas(node.file, gctx));
         const fn: Fn = async (top_ctx: CTX) => {
-            let sub_canvas: ExecutableCanvas
+            let sub_canvas: ExecutableCanvas = top_ctx._this._canvas_instance
+            console.log('canvas call')
             if (!top_ctx._this._canvas_instance) {
                 sub_canvas = top_ctx._this._canvas_instance = _.cloneDeep(canvas_blueprint)
+
                 sub_canvas.nodes.filter((node) => node.type === 'start').forEach((node) => {
                     top_ctx.injectFrame({
                         node,
@@ -57,6 +59,25 @@ export async function loadFileNode(node: FileNode, ectx: ExecutionContext, gctx:
                     }
                 })
             }
+
+            const label = top_ctx.frame.edge?.label
+            if (label) {
+                sub_canvas.nodes.filter((node) => {
+                    return node.type === 'code' && node.lang === 'on'
+                }).forEach((node) => {
+                    top_ctx.injectFrame({
+                        node,
+                        input: top_ctx.input,
+                        state: top_ctx.state,
+                        edge: top_ctx.frame.edge, // pass top edge so that the on node can look at the label
+                        is_aggregating: false,
+                        chart: sub_canvas,
+                        // id and ctx will be added by the engine later
+                    })
+                })
+            }
+
+
             throw new NodeReturnNotIntendedByDesign()
         }
         result_node = {

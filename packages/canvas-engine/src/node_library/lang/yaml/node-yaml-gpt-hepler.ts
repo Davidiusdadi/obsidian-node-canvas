@@ -4,7 +4,6 @@ import {CTX} from "../../../runtime/runtime-types"
 import {logger} from "../../../globals"
 import chalk from "chalk"
 
-
 const openai = new OpenAI({
     apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted,
 });
@@ -24,8 +23,6 @@ export async function gpt_runner_yaml(data: z.output<typeof ZSchemaGPT>, ctx:  C
     logger.info(`${chalk.green(data.model ?? 'model missing')} response: `, chalk.magenta(res.response))
     return res
 }
-
-
 
 
 export async function gpt_runner_generic(data: z.output<typeof ZSchemaGPT>, ctx:  CTX) {

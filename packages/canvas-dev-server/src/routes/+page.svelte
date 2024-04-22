@@ -3,7 +3,7 @@
     import {Background, Controls, type FitViewOptions, MiniMap, type Node, SvelteFlow} from '@xyflow/svelte';
     import '@xyflow/svelte/dist/style.css';
 
-    import {edges, last_message, nodes, sendToRunner} from '$lib/store';
+    import {edges, last_message, messages, nodes, sendToRunner, stack} from '$lib/store';
     import FNode from "$lib/client/FNode.svelte"
     import {get} from "svelte/store"
     import type {ONode} from "canvas-engine/src/compile/canvas-node-transform"
@@ -107,8 +107,13 @@
                         <p>Select a node</p>
                     {/if}
                 {:else if tabSet === 2}
-                    TODO: show logs
-                    {JSON.stringify($last_message)}
+                    <div class="">
+                    {#each $messages as msg}
+                        {#if msg.type === 'llm-chunk'}
+                            <span>{msg.chunk}</span>
+                        {/if}
+                    {/each}
+                    </div>
                 {:else if tabSet === 3}
                     TODO: show input
                 {/if}

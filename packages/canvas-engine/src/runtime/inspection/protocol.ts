@@ -40,6 +40,20 @@ export const zRFrameStep = z.object({
 })
 
 
+export const zRLLMChunk = z.object({
+    type: z.literal('llm-chunk'),
+    chunk: z.string(),
+    frame_id: z.number().optional()
+})
+
+export const zRLog = z.object({
+    type: z.literal('log'),
+    content: z.string(),
+    frame_id: z.number().optional()
+})
+
+export const zRUpdate = z.union([zRLLMChunk, zRLog])
+
 const zRRunnerState = z.object({
     type: z.literal('runner-state'),
     state: z.enum(['stepping', 'running'])
@@ -63,7 +77,8 @@ export const runner2inspector = z.union([
     zRFrameNew,
     zRFrameComplete,
     zRFrameStep,
-    zRRunnerState
+    zRRunnerState,
+    zRUpdate
 ])
 
 export const inspector2runner = zIDebugAction

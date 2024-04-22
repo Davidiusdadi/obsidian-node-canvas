@@ -1,5 +1,7 @@
 import {NodeCompiler} from "../../compile/template"
-import {nunjucks_env, template_render} from "../lang/yaml"
+import {template_render} from "../lang/yaml"
+import {z} from "zod"
+import {zRLog} from "../../runtime/inspection/protocol"
 
 
 export default {
@@ -9,6 +11,13 @@ export default {
         return (ctx) => {
             const render = template_render(code, ctx)
             console.log(render)
+
+            ctx.gctx.introspection?.inform({
+                type: 'log',
+                content: render,
+                frame_id: ctx.frame.id
+            } satisfies z.input<typeof zRLog>)
+
             return ctx.input
         }
     }

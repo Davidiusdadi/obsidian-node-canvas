@@ -32,7 +32,10 @@
     "unist-util-visit": "^5.0.0",
     "yaml": "^2.4.1",
     "yargs": "^17.7.2",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "@langchain/community": "^0.0.44",
+    "@langchain/openai": "^0.0.26",
+    "openai": "^4.29.2"
   },
   "devDependencies": {
     "@swc/cli": "^0.3.10",

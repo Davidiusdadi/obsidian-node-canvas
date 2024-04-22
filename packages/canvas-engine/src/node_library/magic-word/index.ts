@@ -3,6 +3,7 @@ import nodeInlineDecide from './decide'
 import log from './log'
 import llmPrompt from './llm-prompt'
 import canvasIo from "./canvas-io"
+import llm from "./llm"
 
 import {NodeCompiler} from "../../compile/template"
 
@@ -12,5 +13,6 @@ export default [
     question,
     log,
     llmPrompt,
-    ...canvasIo
+    ...canvasIo,
+    ...llm
 ] as NodeCompiler[]
