@@ -1,4 +1,5 @@
 {
+	"extends": "../../tsconfig.json",
 	/* fallback configuration for whole repo */
 	"compilerOptions": {
 		"outDir": "./dist",
@@ -11,7 +12,8 @@
 		"types": ["node"],
 		"skipLibCheck": true,
 		"declaration": true,
-		"declarationMap": true,
+		"declarationMap": true
 	},
-
+	"exclude": ["node_modules" ],
+	"include": ["./src/lib.ts", "./src/main.ts"]
 }
