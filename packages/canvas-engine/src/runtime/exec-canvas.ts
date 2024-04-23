@@ -69,8 +69,11 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
     }
 
 
+    let last_ctx: CTX | null = null
+    let return_value: any | undefined | null
+
     while (true) {
-        let return_value: any | undefined | null
+
 
         let frame: StackFrame | undefined
 
@@ -170,6 +173,7 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
                 gctx: gctx,
                 frame
             }
+            last_ctx = ctx
             frame.ctx = ctx
 
             this_data.join = InputsFilterJoiner.create(ctx, frame)
@@ -208,6 +212,10 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
                 throw e
             }
         }
+    }
+    return {
+        return_value,
+        last_ctx
     }
 }
 
