@@ -4,9 +4,7 @@ import {CTX} from "../../../runtime/runtime-types"
 import {logger} from "../../../globals"
 import chalk from "chalk"
 
-const openai = new OpenAI({
-    apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted,
-});
+let openai: OpenAI
 
 const messageSchema = z.object({
     role: z.enum(["user", "assistant", 'system']).default('user'),
@@ -18,14 +16,20 @@ export const ZSchemaGPT = z.object({
     messages: z.array(messageSchema),
 }).strip()
 
-export async function gpt_runner_yaml(data: z.output<typeof ZSchemaGPT>, ctx:  CTX) {
+export async function gpt_runner_yaml(data: z.output<typeof ZSchemaGPT>, ctx: CTX) {
     const res = await gpt_runner_generic(data, ctx)
     logger.info(`${chalk.green(data.model ?? 'model missing')} response: `, chalk.magenta(res.response))
     return res
 }
 
 
-export async function gpt_runner_generic(data: z.output<typeof ZSchemaGPT>, ctx:  CTX) {
+export async function gpt_runner_generic(data: z.output<typeof ZSchemaGPT>, ctx: CTX) {
+
+    if (!openai) {
+        openai = new OpenAI({
+            apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted,
+        });
+    }
     const chatCompletion = await openai.chat.completions.create({
         ...data
     });
