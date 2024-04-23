@@ -21,3 +21,7 @@ jobs:
         run: |
           cd  packages/canvas-engine
           bun test
+      - name: test build
+        run: |
+          cd  packages/canvas-engine
+          bun run build:lib
