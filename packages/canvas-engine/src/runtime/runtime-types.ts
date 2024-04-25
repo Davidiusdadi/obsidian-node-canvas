@@ -8,7 +8,7 @@ import {MsgRunner2Inspector, runner2inspector} from "./inspection/protocol"
 import { GlobalContext } from "../types"
 
 export type CTX = {
-    emit: (label: string, value: any) => void
+    emit: (label: string | undefined, value: any) => void
     input: any
     vault_dir: string
     _this: FnThis
@@ -20,7 +20,7 @@ export type CTX = {
     injectFrame: (frame: StackFrame) => void
     gctx: GlobalContext,
     frame: StackFrame
-} & Record<string, any>
+}
 
 
 export type Introspection = {
@@ -35,6 +35,9 @@ export const zStackFrame = z.object({
     node: zz<ONode>(),
     input: z.any(),
     state: z.any(),
+    internal_state: z.object({
+        inject_return: z.array(z.function().args(z.any()).returns(z.any()))
+    }).passthrough(),
     edge: z.nullable(zz<OEdge>()),
     is_aggregating: z.boolean(),
     chart: zz<ExecutableCanvas>(),

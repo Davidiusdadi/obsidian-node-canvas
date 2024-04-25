@@ -36,6 +36,9 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
             node,
             input: undefined,
             state: {},
+            internal_state: {
+                inject_return: []
+            },
             edge: null,
             is_aggregating: false,
             chart: inital_canvas,
@@ -54,6 +57,7 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
                 node: node,
                 input: value,
                 state: _.clone(source_frame.ctx!.state),
+                internal_state: _.clone(source_frame.internal_state),
                 edge: e,
                 is_aggregating: false,
                 chart: source_frame.chart
@@ -163,7 +167,7 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
                 updateInput: (input) => ctx.input = input,
                 updateState: (state) => ctx.state = state,
                 injectFrame: (frame: StackFrame) => push_frame(frame),
-                emit: (label: string, emission: any) => {
+                emit: (label: string | undefined, emission: any) => {
                     logger.debug('emitting: ', label, emission)
                     const edges_label_out = node.edges.filter((edge) => {
                         return edge.direction === 'forward' && edge.from === node.id && edge.label?.trim() === label

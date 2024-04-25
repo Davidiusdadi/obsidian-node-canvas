@@ -1,6 +1,8 @@
-import { expect, test } from "bun:test";
+import {expect, test} from "bun:test";
+import {createCanvasEngine} from "../../src/lib"
 
 
-test('test', () => {
-    expect(1).toBe(1);
+test('createCanvasEngine return last return_value', async () => {
+    const res = await createCanvasEngine(import.meta.dirname, "hello.canvas",);
+    expect(res.return_value).toBe(42);
 });

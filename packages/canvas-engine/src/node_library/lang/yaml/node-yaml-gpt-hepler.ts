@@ -3,6 +3,14 @@ import z from "zod"
 import {CTX} from "../../../runtime/runtime-types"
 import {logger} from "../../../globals"
 import chalk from "chalk"
+import _ from "lodash"
+
+const prefix = process.env.LLM_PROVIDER ?? 'OPENAI'
+const LLM_CONFIG = {
+    API_BASE_URL: process.env[`${prefix}_BASE_URL`] ?? 'https://api.openai.com/v1',
+    API_KEY: process.env[`${prefix}_API_KEY`] ?? 'no-key-specifed',
+    API_MODEL: process.env[`${prefix}_API_MODEL`] ?? 'gpt-3.5-turbo'
+}
 
 let openai: OpenAI
 
@@ -12,27 +20,42 @@ const messageSchema = z.object({
 }).strip()
 
 export const ZSchemaGPT = z.object({
-    model: z.string(),
+    model: z.string().default(LLM_CONFIG.API_MODEL),
     messages: z.array(messageSchema),
+    stop: z.array(z.string()).optional(),
 }).strip()
 
-export async function gpt_runner_yaml(data: z.output<typeof ZSchemaGPT>, ctx: CTX) {
+export async function gpt_runner_yaml(data: z.input<typeof ZSchemaGPT>, ctx: CTX) {
     const res = await gpt_runner_generic(data, ctx)
-    logger.info(`${chalk.green(data.model ?? 'model missing')} response: `, chalk.magenta(res.response))
+    logger.debug(`${chalk.green(ZSchemaGPT.parse(data).model ?? 'model missing')} response: `, chalk.magenta(res.response))
     return res
 }
 
 
-export async function gpt_runner_generic(data: z.output<typeof ZSchemaGPT>, ctx: CTX) {
+export async function gpt_runner_generic(data: z.input<typeof ZSchemaGPT>, ctx: CTX) {
 
     if (!openai) {
+        logger.debug(`creating LLM client: ${LLM_CONFIG.API_MODEL} @ ${LLM_CONFIG.API_BASE_URL}`)
         openai = new OpenAI({
-            apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted,
+            baseURL: LLM_CONFIG.API_BASE_URL ?? 'https://api.openai.com/v1',
+            apiKey: LLM_CONFIG.API_KEY, // This is the default and can be omitted,
+            defaultQuery: {
+                model: LLM_CONFIG.API_MODEL ?? 'gpt-3.5-turbo',
+            }
         });
     }
-    const chatCompletion = await openai.chat.completions.create({
-        ...data
-    });
+
+
+    const payload = ZSchemaGPT.parse(data)
+
+    logger.debug(chalk.gray(_.last(payload.messages)?.content ?? ''))
+
+    const completion_config: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming = {
+        ...payload,
+
+    }
+
+    const chatCompletion = await openai.chat.completions.create(completion_config);
 
     const response = chatCompletion.choices[0].message.content?.trim()
 
