@@ -7,6 +7,7 @@ import {yaml_action_runner} from "./node-yaml-action"
 import {logger} from "../../../globals"
 
 import {ExecutionContext} from "../../../compile/types"
+import chalk from "chalk"
 
 
 nunjucks.configure({autoescape: false})
@@ -17,6 +18,21 @@ nunjucks_env.addFilter('json', function (str: string) {
     return JSON.stringify(str, null, 4)
 })
 
+
+// support all the chalk colors
+for (const key of [
+    'green', 'cyan',
+    'blue', 'cyanBright'
+] satisfies (keyof typeof chalk)[]) {
+    const fn = chalk[key]
+    console.log('adding filter: ', key)
+    if (typeof fn === 'function') {
+        nunjucks_env.addFilter(key, function (str: string) {
+            return (fn as any)(str)
+        })
+    }
+
+}
 
 export const json_as_fn = async (json: any, ctx: CTX, canvas_context: ExecutionContext) => {
 
@@ -35,8 +51,20 @@ export const yaml_to_fn = (yaml_string: string, context: ExecutionContext) => {
 
     const fn: Fn = (ctx) => {
         const interpolated = transformObjectStrings(parsed_yaml, (v) => {
-            return template_render(v, ctx)
+            const rendered = template_render(v, ctx)
+
+
+            if (v.startsWith('{{') && v.endsWith('}}')) {
+                try {
+                    return JSON.parse(rendered)
+                } catch (e) {
+                    return rendered
+                }
+            }
+
+            return rendered
         })
+
         return json_as_fn(interpolated, ctx, context)
     }
     return fn
