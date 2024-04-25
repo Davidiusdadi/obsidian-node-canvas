@@ -1,0 +1,19 @@
+{
+	"nodes":[
+		{"id":"425a66bac331a247","type":"text","text":"```ts\nawait sleep('1000')\nreturn state.iter\n```","x":-820,"y":-140,"width":380,"height":100},
+		{"id":"403e6f490b6afde6","type":"text","text":"**inject**: action","x":-420,"y":-380,"width":200,"height":80,"color":"6"},
+		{"id":"a4080def3227bf8a","type":"text","text":"Here we create a loop.\nA caller will need to invoke the `kick-off` and would also provide an **injection** called `action`.","x":-820,"y":-410,"width":340,"height":170,"color":"5"},
+		{"id":"458edf2d0ed179a0","type":"text","text":"**on**: kick-off","x":-511,"y":-780,"width":200,"height":60,"color":"6"},
+		{"id":"28ed82dfad8b0a2e","type":"text","text":"```ts\nstate.iter++;\n```","x":-1060,"y":-540,"width":230,"height":80},
+		{"id":"a724f16ba737ecca","type":"text","text":"```ts\nthis.id = (this.id ?? 0) + 1\nstate = {\n  id: this.id,\n  iter: 0,\n  ...state\n}\n```","x":-1135,"y":-820,"width":380,"height":200},
+		{"id":"43ab8a173c6227c4","type":"text","text":"**log** injected: {{input}} & {{state | json}}","x":-720,"y":-530,"width":360,"height":70}
+	],
+	"edges":[
+		{"id":"4d71b411254d8345","fromNode":"458edf2d0ed179a0","fromSide":"bottom","toNode":"a724f16ba737ecca","toSide":"right"},
+		{"id":"4c31d261b8fa7235","fromNode":"a724f16ba737ecca","fromSide":"bottom","toNode":"28ed82dfad8b0a2e","toSide":"top"},
+		{"id":"d01b6251d2d5b661","fromNode":"28ed82dfad8b0a2e","fromSide":"bottom","toNode":"425a66bac331a247","toSide":"left"},
+		{"id":"9d0652828304786a","fromNode":"425a66bac331a247","fromSide":"right","toNode":"403e6f490b6afde6","toSide":"bottom"},
+		{"id":"b7596ebe574dce38","fromNode":"403e6f490b6afde6","fromSide":"top","toNode":"43ab8a173c6227c4","toSide":"right"},
+		{"id":"1eead511be4a9436","fromNode":"43ab8a173c6227c4","fromSide":"left","toNode":"28ed82dfad8b0a2e","toSide":"right"}
+	]
+}

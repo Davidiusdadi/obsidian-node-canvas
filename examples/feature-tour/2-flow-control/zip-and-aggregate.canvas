@@ -2,7 +2,6 @@
 	"nodes":[
 		{"id":"367f2fabbc0ee841","type":"text","text":"```ts\nreturn {\n    id: 'a', \n    key1: 'key1'\n}\n``` ","x":-259,"y":-60,"width":250,"height":140},
 		{"id":"bfd2de90be95a59c","type":"text","text":"```ts\nreturn {\n    id: 'a', \n    key2: 'key2'\n}\n``` ","x":40,"y":-60,"width":236,"height":140},
-		{"id":"335af68f62fea62f","type":"text","text":"```ts\nfor(let i = 0; i <= 10; i++) {\n   emit('count', i)\n}\n```","x":583,"y":252,"width":377,"height":128},
 		{"id":"5fd6841400f9083f","type":"text","text":"```ts\naggregate()\n\nconsole.log('a: counter now', input)\n```","x":358,"y":533,"width":414,"height":167},
 		{"id":"f0b9fdb709d7430d","type":"text","text":"```ts\nconst inputs = aggregate().list()\n\nconsole.log('counter vals:', inputs)\nconsole.log('b: counter now', input)\n```","x":820,"y":533,"width":480,"height":167},
 		{"id":"4f3293d8c9e8f499","type":"text","text":"```ts\naggregate()\n```","x":886,"y":958,"width":314,"height":83},
@@ -16,7 +15,8 @@
 		{"id":"f34d176e9901212b","type":"text","text":"```ts\nconst obj = zipOnInput('id').merge()\nconsole.log('1. merge on id:', obj)\nreturn obj\n```","x":-103,"y":196,"width":522,"height":120},
 		{"id":"4542eba5d1247c99","type":"text","text":"```ts\nreturn {\n    id: 'a', \n    key3: 'key3'\n}\n```","x":-420,"y":380,"width":370,"height":153},
 		{"id":"26484d7c5e9c5181","type":"text","text":"**log** an aggregate completed","x":415,"y":970,"width":300,"height":60},
-		{"id":"2bb0a8756165dac5","type":"text","text":"start","x":-59,"y":-400,"width":99,"height":60}
+		{"id":"2bb0a8756165dac5","type":"text","text":"start","x":-59,"y":-400,"width":99,"height":60},
+		{"id":"335af68f62fea62f","type":"text","text":"```ts\nfor(let i = 0; i <= 10; i++) {\n   emit('count', i)\n}\n```","x":584,"y":252,"width":377,"height":128}
 	],
 	"edges":[
 		{"id":"ebc1fd2def1cc442","fromNode":"2bb0a8756165dac5","fromSide":"bottom","toNode":"95109145540231cf","toSide":"top"},
