@@ -1,4 +1,4 @@
-import {get, writable} from "svelte/store"
+import {derived, get, writable,} from "svelte/store"
 import {browser} from "$app/environment"
 import _ from "lodash"
 import type {ONode} from "canvas-engine/src/compile/canvas-node-transform"
@@ -11,9 +11,44 @@ import {
 } from "canvas-engine/src/runtime/inspection/protocol"
 import * as Flatted from 'flatted'
 
+export const chart_path = writable<string>('')
+
+type Chart = {
+    nodes: Node<ONode>[],
+    edges: Edge[],
+    path: string
+}
+
+const charts = writable<Chart[]>([])
+
+
+export const chart_list = derived(charts, ($charts) => {
+    return $charts.map((c) => c.path)
+})
+
 
 export const nodes = writable<Node<ONode>[]>([]);
 export const edges = writable<Edge[]>([]);
+/*export const nodes = derived([charts, chart_path], ([$charts, path]) => {
+    return $charts.find((c) => c.path === path)?.nodes ?? empty_nodes
+})
+
+export const edges = derived([charts, chart_path], ([$charts, path]) => {
+    return $charts.find((c) => c.path === path)?.edges ?? empty_edges
+})*/
+
+
+derived([charts, chart_path], (both) => {
+    return both
+}).subscribe(([charts, path]) => {
+    const c = charts.find((c) => c.path === path)
+    if (c) {
+        nodes.set(c.nodes)
+        edges.set(c.edges)
+    }
+})
+
+
 export const stack = writable<zRFrame[]>([])
 export const this_step_frame = writable<zRFrame | null>(null)
 export const messages = writable<MsgRunner2Inspector[]>([])
@@ -38,8 +73,10 @@ function startClient() {
         last_message.set(data)
         if (data.type !== 'canvas') {
 
-            if (data.type === 'frame-new') {
-                stack.update((s) => [...s, data.frame])
+            if (data.type === 'frame-upsert') {
+                stack.update((s) => {
+                    return [...s.filter(f => f.id !== data.frame.id), data.frame]
+                })
             } else if (data.type === 'frame-complete') {
                 stack.update((s) => s.filter((f) => f.id !== data.frame_id))
             } else if (data.type === 'runner-state') {
@@ -113,8 +150,38 @@ function startClient() {
         new_edges = _.uniqBy(new_edges, 'id')
 
 
-        nodes.set(new_nodes)
-        edges.set(new_edges)
+        //nodes.set(new_nodes)
+        //edges.set(new_edges)
+
+        charts.update((charts: Chart[]) => {
+            const existing = charts.findIndex((c) => c.path === data.canvas.file)
+            if (existing === -1) {
+                charts.push({
+                    nodes: new_nodes,
+                    edges: new_edges,
+                    path: data.canvas.file
+                })
+            } else {
+                charts.splice(existing, 1, {
+                    nodes: new_nodes,
+                    edges: new_edges,
+                    path: data.canvas.file
+                })
+            }
+            return charts
+
+        })
+
+
+        chart_path.update(p => {
+            if (p) {
+                return p
+            }
+            if (data.is_start_canvas) {
+                return data.canvas.file
+            }
+            return p
+        })
 
         console.log('edges:', new_edges)
 

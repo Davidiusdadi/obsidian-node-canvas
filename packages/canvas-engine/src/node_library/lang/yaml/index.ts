@@ -25,7 +25,6 @@ for (const key of [
     'blue', 'cyanBright'
 ] satisfies (keyof typeof chalk)[]) {
     const fn = chalk[key]
-    console.log('adding filter: ', key)
     if (typeof fn === 'function') {
         nunjucks_env.addFilter(key, function (str: string) {
             return (fn as any)(str)
@@ -35,8 +34,6 @@ for (const key of [
 }
 
 export const json_as_fn = async (json: any, ctx: CTX, canvas_context: ExecutionContext) => {
-
-    logger.debug('compiled yaml: ', json)
     const completion_opts = ZSchemaGPT.safeParse(json)
     if (completion_opts.success) {
         return gpt_runner_yaml(completion_opts.data, ctx)

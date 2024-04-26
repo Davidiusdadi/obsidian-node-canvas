@@ -23,16 +23,19 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
 
 
     const push_frame = (frame: StackFrame) => {
+        if(frame.id === undefined) {
+            frame.id = ++frame_id
+        }
         stack.push(frame)
+        //logger.debug(`push_frame:  --[${frame.edge?.label ?? '-'}]-->`)
         gctx.introspection?.inform({
-            type: 'frame-new',
+            type: 'frame-upsert',
             frame,
         } satisfies z.input<typeof zRFrameNew>)
     }
 
     inital_canvas.nodes.filter((node) => node.type === 'start').forEach((node) => {
         push_frame({
-            id: ++frame_id,
             node,
             input: undefined,
             state: {},
@@ -124,7 +127,11 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
 
 
         const {fn, ...node_debug} = node
-        logger.debug('executing node: ', node.type, (node as any)?.code ?? '')
+
+        await gctx.introspection?.inform({
+            type: 'frame-upsert',
+            frame,
+        } satisfies z.input<typeof zRFrameNew>)
 
         await gctx.introspection?.inform({
             type: 'frame-step',
@@ -185,10 +192,10 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
 
             frame.chart.node_this_data.set(node.id, this_data)
 
+            logger.debug('exec: ',`--[${frame.edge?.label ?? '-'}]-->(${ node.type}: lang: ${(node as any)?.lang}) :: ${ chalk.gray((node as any)?.code  ?? '<no-code>') }`)
+
             try {
                 return_value = await node.fn.call(this_data, ctx)
-
-                logger.debug(`following edges: ${edges_default_out.length}`)
                 emit_along_edges(frame, edges_default_out, return_value)
                 await gctx.introspection?.inform({
                     type: 'frame-complete',
@@ -196,6 +203,10 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
                 } satisfies z.input<typeof zRFrameComplete>)
             } catch (e) {
                 if (e instanceof NodeReturnNotIntendedByDesign) {
+                    await gctx.introspection?.inform({
+                        type: 'frame-complete',
+                        frame_id: frame.id!,
+                    } satisfies z.input<typeof zRFrameComplete>)
                     continue // for some nodes a final return does not make sense
                 } else if (e instanceof InputsNotFullfilled) {
                     if (e.is_aggregating) {

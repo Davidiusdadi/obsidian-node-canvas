@@ -15,7 +15,7 @@ export function color(cstr?: string){
             return "#f1a527";
         case "3":
             // yellow
-            return "#FFFF00";
+            return "#eed96a";
         case "4":
             // green
             return "#20f620";

@@ -1,5 +1,6 @@
 import {NodeCompiler} from "../../compile/template"
 import * as readline from 'readline';
+import {logger} from "../../globals"
 
 // Function to read a line from stdin
 const readLineAsync = (query: string): Promise<string> => {
@@ -21,7 +22,7 @@ export default {
     lang: 'debug',
     compile: async (code) => {
         return async (ctx) => {
-
+            logger.debug('debug input:', ctx.input)
 
             await readLineAsync('(debug) Press enter to resume...')
             return ctx.input

@@ -1,6 +1,6 @@
 import {WebSocket, WebSocketServer} from 'ws';
 import {ExecutableCanvas} from "../ExecutableCanvas"
-import {inspector2runner, MsgRunner2Inspector, RRunnerState, runner2inspector} from "./protocol"
+import {DMsgCanvas, inspector2runner, MsgRunner2Inspector, RRunnerState, runner2inspector} from "./protocol"
 import {GlobalContext} from "../../types"
 import * as Flatted from 'flatted';
 import {logger} from "../../globals"
@@ -20,7 +20,7 @@ export const startDevServer = () => {
         state: 'running'
     }
 
-    let canvas: ExecutableCanvas | null = null
+    let canvases: ExecutableCanvas[] = []
 
     wss.on('connection', function connection(ws) {
         logger.info('inspector connected');
@@ -32,10 +32,13 @@ export const startDevServer = () => {
             ws.send(Flatted.stringify(msg))
         }
 
-        send({
-            type: 'canvas',
-            canvas: canvas
+        canvases.forEach((canvas) => {
+            send({
+                type: 'canvas',
+                canvas
+            } satisfies DMsgCanvas)
         })
+
         send(runner_state)
 
 
@@ -72,24 +75,30 @@ export const startDevServer = () => {
 
 
     return {
-        setCanvas: (c: ExecutableCanvas) => {
-            canvas = c
-        },
         installGlobalIntrospections: (context: GlobalContext) => {
 
             context.introspection = {
                 inform: async (msg) => {
-                    const wire_msg = runner2inspector.parse(msg)
-                    logger.info('Sending:', wire_msg)
+                    try {
+                        const wire_msg = runner2inspector.parse(msg)
+                        logger.info('Sending:', wire_msg)
+
+                        if(wire_msg.type === 'canvas') {
+                            canvases.push(wire_msg.canvas!)
+                        }
 
 
-                    const str = Flatted.stringify(wire_msg)
-                    clients.forEach((ws) => {
-                        ws.send(str)
-                    })
+                        const str = Flatted.stringify(wire_msg)
+                        clients.forEach((ws) => {
+                            ws.send(str)
+                        })
 
-                    if (runner_state.state === 'stepping' && msg.type === 'frame-step') {
-                        await waitForInput()
+                        if (runner_state.state === 'stepping' && msg.type === 'frame-step') {
+                            await waitForInput()
+                        }
+                    } catch (e) {
+                        logger.error('Error sending message to inspector:', JSON.stringify(msg, null, 2))
+                        process.exit(1)
                     }
                 },
                 installIntrospections: (canvas: ExecutableCanvas) => {

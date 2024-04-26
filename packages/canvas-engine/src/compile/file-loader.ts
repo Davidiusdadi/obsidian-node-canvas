@@ -12,7 +12,7 @@ import emitState from "../node_library/magic-word/canvas-io/emit-state"
 import {GlobalContext} from "../types"
 import {OEdge} from "./canvas-edge-transform"
 import inject, {InjectFn} from "../node_library/magic-word/canvas-io/inject"
-import {logger} from "../globals"
+import {DMsgCanvas} from "../runtime/inspection/protocol"
 
 type FileNode = Extract<ONode, { type: 'file' }>
 
@@ -25,6 +25,12 @@ export async function loadFileNode(node: FileNode, ectx: ExecutionContext, gctx:
     let result_node: ONode
     if (file.ext === '.canvas') {
         const canvas_blueprint = new ExecutableCanvas(node.file, await parseCanvas(node.file, gctx));
+
+        gctx.introspection?.inform({
+            type: 'canvas',
+            canvas: canvas_blueprint
+        } satisfies DMsgCanvas)
+
         const fn: Fn = async (top_ctx: CTX) => {
             let sub_canvas: ExecutableCanvas = top_ctx._this._canvas_instance
             if (!top_ctx._this._canvas_instance) {
@@ -73,6 +79,8 @@ export async function loadFileNode(node: FileNode, ectx: ExecutionContext, gctx:
                                 sub_fn.call(this, {
                                     ...sub_ctx,
                                     emit: (label, value) => {
+                                        top_ctx.state = sub_ctx.state
+                                        top_ctx.frame.internal_state = sub_ctx.frame.internal_state
                                         top_ctx.emit(label, value)
                                     }
                                 })
@@ -89,7 +97,7 @@ export async function loadFileNode(node: FileNode, ectx: ExecutionContext, gctx:
                                 node_overloads.forEach((jank) => {
                                     const internal_state = _.clone(sub_ctx.frame.internal_state)
                                     internal_state.inject_return.push((xtx: CTX) => {
-                                        logger.debug('performing inject return', sub_ctx.frame.node.original)
+                                        //logger.debug('performing inject return', sub_ctx.frame.node.original)
                                         sub_ctx.state = xtx.state
                                         return sub_ctx.emit(undefined, xtx.input)
                                     })

@@ -21,11 +21,12 @@ export type zRFrame = z.output<typeof zFrame>
 
 const zRCanvas = z.object({
     type: z.literal('canvas'),
-    canvas: z.nullable(zz<ExecutableCanvas>())
+    canvas: zz<ExecutableCanvas>(),
+    is_start_canvas: z.boolean().optional()
 })
 
 export const zRFrameNew = z.object({
-    type: z.literal('frame-new'),
+    type: z.literal('frame-upsert'),
     frame: zFrame
 })
 

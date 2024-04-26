@@ -25,3 +25,18 @@ body {
 .prose :where(code):not(:where([class~="not-prose"],[class~="not-prose"] *))::after {
     content: "" !important;
 }
+
+.language-bash {
+    position: relative;
+    overflow: visible !important;
+}
+
+.language-bash::after {
+    content: "bash";
+    position: absolute;
+    right: 0;
+    top: -17px;
+    font-weight: bold;
+    font-size: 1em;
+    opacity: 0.5;
+}

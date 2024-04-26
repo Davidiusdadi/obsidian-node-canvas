@@ -3,7 +3,7 @@ import z from "zod"
 import {CTX} from "../../../runtime/runtime-types"
 import {logger} from "../../../globals"
 import chalk from "chalk"
-import _ from "lodash"
+import yaml from "js-yaml"
 
 const prefix = process.env.LLM_PROVIDER ?? 'OPENAI'
 const LLM_CONFIG = {
@@ -48,7 +48,7 @@ export async function gpt_runner_generic(data: z.input<typeof ZSchemaGPT>, ctx: 
 
     const payload = ZSchemaGPT.parse(data)
 
-    logger.debug(chalk.gray(_.last(payload.messages)?.content ?? ''))
+    logger.debug('GPT payload: ', chalk.yellow(yaml.dump(payload)))
 
     const completion_config: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming = {
         ...payload,

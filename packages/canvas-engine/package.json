@@ -2,50 +2,57 @@
   "name": "canvas-engine",
   "version": "1.0.0",
   "main": "dist/lib.js",
+  "module": "dist/lib.js",
   "types": "dist/lib.d.ts",
   "license": "private",
   "private": true,
   "type": "commonjs",
+  "engines": {
+    "node": "20"
+  },
   "scripts": {
     "build": "esbuild src/main.ts --bundle --loader:.ts=ts --platform=node \"--external:@babel/preset-typescript/*\" --outfile=build/main.js --sourcemap",
     "dev": "this_workspace=`pwd`; yarn -s build && cd ../.. && node \"$this_workspace\"/build/main.js",
     "dev:inspect": "this_workspace=`pwd`; yarn -s build && cd ../.. && node --inspect \"$this_workspace\"/build/main.js",
     "dev:inspect-brk": "this_workspace=`pwd`; yarn -s build && cd ../.. && node --inspect-brk  \"$this_workspace\"/build/main.js",
-    "build:lib": "tsc"
+    "build:tsc": "tsc",
+    "build:lib": "esbuild src/lib.ts --bundle --loader:.ts=ts --platform=node \"--external:@babel/preset-typescript/*\" --outfile=dist/lib.js --sourcemap && tsc --emitDeclarationOnly"
   },
   "dependencies": {
+    "@langchain/community": "^0.0.44",
+    "@langchain/openai": "^0.0.26",
     "axios": "^1.6.8",
     "canvas": "^2.11.2",
     "chalk": "^5.3.0",
     "cheerio": "^1.0.0-rc.12",
     "chokidar": "^3.6.0",
-    "esbuild": "^0.20.2",
     "flatted": "^3.3.1",
     "gray-matter": "^4.0.3",
+    "js-yaml": "^4.1.0",
     "jsdom": "^24.0.0",
     "lodash": "^4.17.21",
     "nunjucks": "^3.2.4",
+    "openai": "^4.29.2",
     "remark-parse": "^11.0.0",
-    "ts-node": "^10.9.2",
     "typescript": "^5.4.3",
     "unified": "^11.0.4",
     "unist-util-visit": "^5.0.0",
     "yaml": "^2.4.1",
     "yargs": "^17.7.2",
     "zod": "^3.22.4",
-    "@langchain/community": "^0.0.44",
-    "@langchain/openai": "^0.0.26",
-    "openai": "^4.29.2"
+    "sucrase": "^3.35.0"
   },
   "devDependencies": {
     "@swc/cli": "^0.3.10",
-    "@types/lodash": "^4.17.0",
-    "sucrase": "^3.35.0",
     "@trbn/jsoncanvas": "^1.0.6",
+    "@types/bun": "latest",
+    "@types/js-yaml": "^4.0.9",
     "@types/jsdom": "^21.1.6",
+    "@types/lodash": "^4.17.0",
     "@types/node": "^20.11.30",
     "@types/nunjucks": "^3.2.6",
     "@types/yargs": "^17.0.32",
-    "@types/bun": "latest"
+
+    "esbuild": "^0.20.2"
   }
 }

@@ -9,7 +9,8 @@ import path from "node:path"
 import {existsSync} from "node:fs"
 import {ExecutableCanvas} from "./runtime/ExecutableCanvas"
 import {startDevServer} from "./runtime/inspection/server"
-import {GlobalContext} from "./types"
+import {GlobalContext, ParsedCanvas} from "./types"
+import {DMsgCanvas} from "./runtime/inspection/protocol"
 
 
 const args = yargs(hideBin(process.argv))
@@ -44,12 +45,12 @@ const should_start_server = args.server
 if (args.debug) {
     logger.debug = (...args: any[]) => {
         const args_nice = args.map(a => typeof a === 'string' ? debug_color(a) : a)
-        console.debug(...args_nice)
+        console.debug('(dbg)',...args_nice)
     }
 }
 
 
-const debug_color = chalk.magenta;
+const debug_color = chalk.reset;
 let stage = 'parsing';
 
 // parse canvas and run it
@@ -114,7 +115,7 @@ async function parseAndRun() {
             loaded_files: {}
         }
 
-        let node_data = await parseCanvas(canvas_path, global_context)
+        let node_data: ParsedCanvas
 
         stage = 'runtime'
 
@@ -131,7 +132,12 @@ async function parseAndRun() {
                 node_data = await parseCanvas(canvas_path, global_context)
 
                 let canvas = new ExecutableCanvas(canvas_path, node_data)
-                inspector.setCanvas(canvas)
+
+                global_context.introspection?.inform({
+                    type: 'canvas',
+                    canvas,
+                    is_start_canvas: true
+                } satisfies DMsgCanvas)
 
                 console.log('waiting for inspector to connect / (re)start...')
                 await global_context.introspection?.waitForInput()
@@ -139,6 +145,7 @@ async function parseAndRun() {
             }
 
         } else {
+            node_data = await parseCanvas(canvas_path, global_context)
             await execCanvas(new ExecutableCanvas(canvas_path, node_data), global_context)
         }
 
