@@ -27,5 +27,12 @@
  */
 
 import './index.css';
+import App from './App.svelte';
+
+const app = new App({
+  target: document.body,
+});
+
+
 
 console.log('👋 This message is being logged by "renderer.ts", included via Vite');
