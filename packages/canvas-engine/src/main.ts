@@ -140,7 +140,7 @@ async function parseAndRun() {
                 } satisfies DMsgCanvas)
 
                 console.log('waiting for inspector to connect / (re)start...')
-                await global_context.introspection?.waitForInput()
+                await global_context.introspection?.waitForInput?.()
                 await execCanvas(canvas, global_context)
             }
 

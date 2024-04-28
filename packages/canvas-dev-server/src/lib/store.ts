@@ -29,13 +29,6 @@ export const chart_list = derived(charts, ($charts) => {
 
 export const nodes = writable<Node<ONode>[]>([]);
 export const edges = writable<Edge[]>([]);
-/*export const nodes = derived([charts, chart_path], ([$charts, path]) => {
-    return $charts.find((c) => c.path === path)?.nodes ?? empty_nodes
-})
-
-export const edges = derived([charts, chart_path], ([$charts, path]) => {
-    return $charts.find((c) => c.path === path)?.edges ?? empty_edges
-})*/
 
 
 derived([charts, chart_path], (both) => {
@@ -90,100 +83,97 @@ function startClient() {
 
             return
         }
-        console.log('Received:', data)
-        if (!data.canvas) {
-            console.log('No canvas data')
-            return
-        }
 
-        console.log('Canvas data:', data.canvas)
-        let new_edges: Edge[] = []
-        const new_nodes: Node<ONode>[] = data.canvas?.nodes.map((node) => {
+        if (data.type === 'canvas') {
+            console.log('Canvas data:', data.canvas)
+            let new_edges: Edge[] = []
+            const new_nodes: Node<ONode>[] = data.canvas?.nodes.map((node) => {
 
 
-            for (const edge of node.edges) {
-                const e: Edge = {
-                    id: edge.id,
-                    source: edge.from,
-                    target: edge.to,
-                    sourceHandle: `${edge.from}-${edge.orginal.fromSide!}-source`,
-                    targetHandle: `${edge.to}-${edge.orginal.toSide!}-target`,
-                    style: ` stroke-width: 2px; stroke: ${color(edge.orginal.color)};`,
-                    label: edge.orginal.label,
-                    labelStyle: 'font-size: 16px; background-color: white; padding: 2px; border-radius: 4px;',
+                for (const edge of node.edges) {
+                    const e: Edge = {
+                        id: edge.id,
+                        source: edge.from,
+                        target: edge.to,
+                        sourceHandle: `${edge.from}-${edge.orginal.fromSide!}-source`,
+                        targetHandle: `${edge.to}-${edge.orginal.toSide!}-target`,
+                        style: ` stroke-width: 2px; stroke: ${color(edge.orginal.color)};`,
+                        label: edge.orginal.label,
+                        labelStyle: 'font-size: 16px; background-color: white; padding: 2px; border-radius: 4px;',
+                        deletable: false,
+                        type: 'bezier',
+                    }
+
+                    if (edge.orginal.fromEnd === 'arrow') {
+                        e.markerStart = {
+                            type: MarkerType.ArrowClosed,
+                            height: 15,
+                            width: 15,
+                            color: color(edge.orginal.color)
+
+                        }
+                    }
+                    if (edge.orginal.toEnd === 'arrow') {
+                        e.markerEnd = {
+                            type: MarkerType.ArrowClosed,
+                            height: 15,
+                            width: 15,
+                            color: color(edge.orginal.color)
+                        }
+                    }
+                    new_edges.push(e)
+                }
+                return {
+                    type: 'FNode',
+                    id: node.id,
+                    position: {x: node.original.x, y: node.original.y},
+                    data: node,
+                    draggable: false,
+                    //origin: [ 0.5, 0.5],
                     deletable: false,
-                    type: 'bezier',
+                    width: node.original.width,
+                    height: node.original.height,
+                } satisfies Node<ONode>
+            })
+
+            new_edges = _.uniqBy(new_edges, 'id')
+
+
+            //nodes.set(new_nodes)
+            //edges.set(new_edges)
+
+            charts.update((charts: Chart[]) => {
+                const existing = charts.findIndex((c) => c.path === data.canvas.file)
+                if (existing === -1) {
+                    charts.push({
+                        nodes: new_nodes,
+                        edges: new_edges,
+                        path: data.canvas.file
+                    })
+                } else {
+                    charts.splice(existing, 1, {
+                        nodes: new_nodes,
+                        edges: new_edges,
+                        path: data.canvas.file
+                    })
                 }
+                return charts
 
-                if (edge.orginal.fromEnd === 'arrow') {
-                    e.markerStart = {
-                        type: MarkerType.ArrowClosed,
-                        height: 15,
-                        width: 15,
-                        color: color(edge.orginal.color)
+            })
 
-                    }
+
+            chart_path.update(p => {
+                if (p) {
+                    return p
                 }
-                if (edge.orginal.toEnd === 'arrow') {
-                    e.markerEnd = {
-                        type: MarkerType.ArrowClosed,
-                        height: 15,
-                        width: 15,
-                        color: color(edge.orginal.color)
-                    }
+                if (data.is_start_canvas) {
+                    return data.canvas.file
                 }
-                new_edges.push(e)
-            }
-            return {
-                type: 'FNode',
-                id: node.id,
-                position: {x: node.original.x, y: node.original.y},
-                data: node,
-                draggable: false,
-                //origin: [ 0.5, 0.5],
-                deletable: false,
-                width: node.original.width,
-                height: node.original.height,
-            } satisfies Node<ONode>
-        })
-
-        new_edges = _.uniqBy(new_edges, 'id')
-
-
-        //nodes.set(new_nodes)
-        //edges.set(new_edges)
-
-        charts.update((charts: Chart[]) => {
-            const existing = charts.findIndex((c) => c.path === data.canvas.file)
-            if (existing === -1) {
-                charts.push({
-                    nodes: new_nodes,
-                    edges: new_edges,
-                    path: data.canvas.file
-                })
-            } else {
-                charts.splice(existing, 1, {
-                    nodes: new_nodes,
-                    edges: new_edges,
-                    path: data.canvas.file
-                })
-            }
-            return charts
-
-        })
-
-
-        chart_path.update(p => {
-            if (p) {
                 return p
-            }
-            if (data.is_start_canvas) {
-                return data.canvas.file
-            }
-            return p
-        })
+            })
 
-        console.log('edges:', new_edges)
+            console.log('edges:', new_edges)
+        }
 
 
     };

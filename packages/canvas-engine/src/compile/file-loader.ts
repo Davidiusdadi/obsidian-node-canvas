@@ -8,7 +8,6 @@ import {ExecutableCanvas} from "../runtime/ExecutableCanvas"
 import _ from "lodash"
 import emitInput from "../node_library/magic-word/canvas-io/emit-input"
 import {NodeReturnNotIntendedByDesign} from "../runtime/errors"
-import emitState from "../node_library/magic-word/canvas-io/emit-state"
 import {GlobalContext} from "../types"
 import {OEdge} from "./canvas-edge-transform"
 import inject, {InjectFn} from "../node_library/magic-word/canvas-io/inject"
@@ -36,11 +35,14 @@ export async function loadFileNode(node: FileNode, ectx: ExecutionContext, gctx:
             if (!top_ctx._this._canvas_instance) {
                 sub_canvas = top_ctx._this._canvas_instance = _.cloneDeep(canvas_blueprint)
 
+                const label = (top_ctx.frame.edge?.label ?? '').trim()
+                //console.log('INSTANTIATING CANVAS from', label)
                 sub_canvas.nodes.filter((node) => node.type === 'start').forEach((node) => {
                     top_ctx.injectFrame({
                         node,
-                        input: undefined,
-                        state: {},
+                        parent: top_ctx.frame.id!,
+                        input: top_ctx.input,
+                        state: _.clone(top_ctx.state),
                         internal_state: _.clone(top_ctx.frame.internal_state),
                         edge: null,
                         is_aggregating: false,
@@ -72,8 +74,7 @@ export async function loadFileNode(node: FileNode, ectx: ExecutionContext, gctx:
                     if (node.type === 'code'
                     ) {
 
-                        if (node.compiler?.lang === emitInput.lang
-                            || node.compiler?.lang === emitState.lang) {
+                        if (node.compiler?.lang === emitInput.lang) {
                             const sub_fn = node.fn
                             node.fn = function (sub_ctx) {
                                 sub_fn.call(this, {
@@ -99,10 +100,12 @@ export async function loadFileNode(node: FileNode, ectx: ExecutionContext, gctx:
                                     internal_state.inject_return.push((xtx: CTX) => {
                                         //logger.debug('performing inject return', sub_ctx.frame.node.original)
                                         sub_ctx.state = xtx.state
+                                        sub_ctx.frame.internal_state = xtx.frame.internal_state
                                         return sub_ctx.emit(undefined, xtx.input)
                                     })
                                     top_ctx.injectFrame({
                                         node: jank.top_jank_node,
+                                        parent: top_ctx.frame.id!,
                                         input: sub_ctx.input,
                                         state: sub_ctx.state,
                                         internal_state,
@@ -128,6 +131,7 @@ export async function loadFileNode(node: FileNode, ectx: ExecutionContext, gctx:
                 }).forEach((node) => {
                     top_ctx.injectFrame({
                         node,
+                        parent: top_ctx.frame.id!,
                         input: top_ctx.input,
                         state: top_ctx.state,
                         edge: top_ctx.frame.edge, // pass top edge so that the on node can look at the label

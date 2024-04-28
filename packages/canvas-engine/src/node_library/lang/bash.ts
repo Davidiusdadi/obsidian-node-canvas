@@ -1,6 +1,7 @@
 import {NodeCompiler} from "../../compile/template"
 import {spawn} from 'child_process'
-import {nunjucks_env, template_render} from "./yaml"
+import {template_render} from "./yaml"
+import {logger} from "../../globals"
 
 export default {
     lang: 'bash',
@@ -12,7 +13,7 @@ export default {
                 exit = resolve;
             })
 
-            const process = spawn('bash', [
+            const bash_proc = spawn('bash', [
                 '-c', template_render(code, ctx)
             ]);
 
@@ -32,7 +33,8 @@ export default {
             }
 
 
-            process.stdout.on('data', (data) => {
+            bash_proc.stdout.on('data', (data) => {
+                process.stdout.write(data)
                 const lines = (partialLineStdout + data.toString()).split('\n');
                 lines.forEach((line, index) => {
                     if (index === lines.length - 1 && line) {
@@ -45,7 +47,8 @@ export default {
             });
 
 
-            process.stderr.on('data', (data) => {
+            bash_proc.stderr.on('data', (data) => {
+                process.stdout.write(data)
                 const lines = (partialLineStderr + data.toString()).split('\n');
                 lines.forEach((line, index) => {
                     if (index === lines.length - 1 && line) {
@@ -58,7 +61,7 @@ export default {
             });
 
 
-            process.on('close', (code) => {
+            bash_proc.on('close', (code) => {
                 // Process any remaining partial line if the process closes
                 if (partialLineStdout) {
                     processStdoutLine(partialLineStdout);
@@ -71,7 +74,21 @@ export default {
                 exit(code);
             });
 
-            return exit_promise
+            const competion = await Promise.race([
+                exit_promise, new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        resolve('timeout');
+                    }, 10 * 1000);
+                })]);
+
+            if (competion === 'timeout') {
+                logger.trace('<bash timeout error>')
+                ctx.emit('timeout', ctx.input)
+                bash_proc.kill('SIGKILL');
+                return -1
+            }
+
+            return competion
         }
     }
 } satisfies NodeCompiler

@@ -1,6 +1,7 @@
 import {NodeCompiler} from "../../../compile/template"
 import {NodeReturnNotIntendedByDesign} from "../../../runtime/errors"
 import {Fn} from "../../../runtime/runtime-types"
+import {logger} from "../../../globals"
 
 
 export type InjectFn = Fn & {
@@ -12,6 +13,7 @@ export default {
     lang: 'return',
     compile: async (code) => {
         const fn: Fn = (ctx) => {
+            logger.trace(`<frame ${ctx.frame.id}: inject return called: current depth: ${ctx.frame.internal_state.inject_return.length}>`)
             const inject_return = ctx.frame.internal_state.inject_return.pop()
             if (!inject_return) {
                 throw new Error(`return called without a previous inject`)

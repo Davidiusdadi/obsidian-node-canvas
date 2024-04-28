@@ -139,6 +139,9 @@
                             <h3>Input</h3>
                             {@html mdToHtml(`\`\`\`yaml\n${yaml.dump($this_step_frame?.input, {indent: 2})}\n\`\`\``)}
 
+                            <h3>State</h3>
+                            {@html mdToHtml(`\`\`\`yaml\n${yaml.dump($this_step_frame?.state, {indent: 2})}\n\`\`\``)}
+
 
                         {:else if tabSet === 4}
                             <ul>

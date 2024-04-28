@@ -1,9 +1,7 @@
 import type {ExecutableCanvas} from "../ExecutableCanvas"
 import {z} from "zod"
-import { zStackFrame} from "../runtime-types"
+import {zStackFrame} from "../runtime-types"
 import {zz} from "../helper"
-
-
 
 
 const zFrame = zStackFrame.transform((f) => {
@@ -32,7 +30,27 @@ export const zRFrameNew = z.object({
 
 export const zRFrameComplete = z.object({
     type: z.literal('frame-complete'),
-    frame_id: z.number()
+    frame: zFrame,
+    was_invoked: z.boolean(),
+    return_canceled: z.boolean(),
+    return_emissions: z.number(),
+    return_value: z.any().optional(),
+    reason: z.enum([
+        'not-ready',
+        'no-return-intended',
+        'error',
+        'aggregation',
+        'pass'
+    ])
+
+}).transform((f) => {
+    return {
+        type: 'frame-complete' as const,
+        frame_id: f.frame.id,
+        return_canceled: f.return_canceled,
+        return_emissions: f.return_emissions,
+        reason: f.reason,
+    }
 })
 
 export const zRFrameStep = z.object({
@@ -67,7 +85,6 @@ const zIDebugAction = z.object({
     type: z.literal('debug-action'),
     action: z.enum(['step', 'fast-forward'])
 })
-
 
 
 export type DMsgCanvas = z.infer<typeof zRCanvas>

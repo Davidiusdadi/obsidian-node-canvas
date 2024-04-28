@@ -19,19 +19,22 @@ export type CTX = {
     updateState: (new_state: any) => void,
     injectFrame: (frame: StackFrame) => void
     gctx: GlobalContext,
-    frame: StackFrame
+    frame: StackFrame,
+    // join it will always be set during node execution
+    join?: InputsFilterJoiner
 }
 
 
 export type Introspection = {
     inform: (msg: z.input<typeof runner2inspector>) => Promise<void> | void
-    waitForInput(): Promise<any>
-
-    installIntrospections: (canvas: ExecutableCanvas) => void
+    waitForInput?(): Promise<any>
+    installIntrospections?: (canvas: ExecutableCanvas) => void
 }
 
 export const zStackFrame = z.object({
     id: z.optional(z.number()),
+    /// parent frame id
+    parent: z.number(),
     node: zz<ONode>(),
     input: z.any(),
     state: z.any(),
@@ -48,8 +51,6 @@ export type StackFrame = z.output<typeof zStackFrame>
 
 export type FnThis = {
     _invocations: Record<string, StackFrame[]>
-    // join it will always be set during node execution
-    join?: InputsFilterJoiner
 } & Record<string, any>
 export type Fn = (this: FnThis, ctx: CTX) => any | Promise<any>
 

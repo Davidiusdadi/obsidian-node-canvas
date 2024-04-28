@@ -1,6 +1,7 @@
 import _ from "lodash"
 import {CTX, StackFrame} from "./runtime-types"
 import {BadCanvasInstruction, InputsNotFullfilled} from "./errors"
+import {logger} from "../globals"
 
 
 interface JoinerState {
@@ -40,10 +41,14 @@ export class InputsFilterJoiner {
     }
 
     get aggregate() {
+        logger.trace(`<frame ${this.ctx.frame.id} attempt aggregation>`)
         this.guardJoinOrAggregateStillPossible()
+
         if (!this.frame.is_aggregating) {
+            logger.trace(`<frame ${this.ctx.frame.id} aggregation begins>`)
             throw new InputsNotFullfilled(true)
         }
+        logger.trace(`${this.ctx.frame.id} aggregation complete`)
         const new_inputs = _.flatten(
             Object.values(this.inputs).map((invocations) => invocations.map((invocation) => invocation.input))
         )
@@ -53,13 +58,13 @@ export class InputsFilterJoiner {
 
         // reset inputs
         for (const edge_id of Object.keys(this.inputs)) {
-            this.inputs[edge_id] = []
+            this.inputs[edge_id].length = 0
         }
 
         this.ctx.updateInput(new_inputs)
         this.ctx.updateState(new_state)
         this.completed = 'aggregate'
-        const res =  Object.assign(() => this.ctx.input, this.resultAPI('input'))
+        const res = Object.assign(() => this.ctx.input, this.resultAPI('input'))
         return res
     }
 
@@ -92,7 +97,7 @@ export class InputsFilterJoiner {
 
         for (const edge_id of Object.keys(this.inputs)) {
             const index = this.ctx._this._invocations[edge_id].indexOf(first_edge_match[edge_id])
-            if(index === -1) {
+            if (index === -1) {
                 continue
             }
             this.ctx._this._invocations[edge_id].splice(index, 1)

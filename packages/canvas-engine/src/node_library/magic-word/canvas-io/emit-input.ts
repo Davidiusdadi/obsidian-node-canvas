@@ -8,6 +8,7 @@ export default {
         return (ctx) => {
             // this function will be manipulated by the file-loader in order bridge between caller and callee .canvas
             ctx.emit(code, ctx.input)
+            return ctx.input
         }
     }
 } satisfies NodeCompiler

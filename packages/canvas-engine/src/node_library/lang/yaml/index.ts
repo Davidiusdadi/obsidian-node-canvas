@@ -22,9 +22,12 @@ nunjucks_env.addFilter('json', function (str: string) {
 // support all the chalk colors
 for (const key of [
     'green', 'cyan',
-    'blue', 'cyanBright'
+    'blue', 'cyanBright',
+    'red', 'yellow', 'gray', 'magenta',
+    "bold", 'reset', "green", "red", "yellow", "blue", "magenta", "cyan", "white", "black", "bgGreen", "bgRed", "bgYellow", "bgBlue", "bgMagenta", "bgCyan", "bgWhite", "bgBlack", "bold", "dim", "italic", "underline", "inverse", "hidden", "strikethrough", "visible",  'redBright', 'greenBright', 'yellowBright', 'blueBright', 'magentaBright', 'whiteBright', 'blackBright'
 ] satisfies (keyof typeof chalk)[]) {
     const fn = chalk[key]
+    fn('color-crash-test') // this will crash if a color does not exist
     if (typeof fn === 'function') {
         nunjucks_env.addFilter(key, function (str: string) {
             return (fn as any)(str)

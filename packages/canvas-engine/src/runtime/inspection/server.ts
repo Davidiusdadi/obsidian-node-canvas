@@ -28,7 +28,6 @@ export const startDevServer = () => {
         clients.add(ws)
 
         const send = (msg: MsgRunner2Inspector) => {
-            logger.debug('Sending:', msg)
             ws.send(Flatted.stringify(msg))
         }
 
@@ -81,7 +80,7 @@ export const startDevServer = () => {
                 inform: async (msg) => {
                     try {
                         const wire_msg = runner2inspector.parse(msg)
-                        logger.info('Sending:', wire_msg)
+                        logger.debug('(introspection)', wire_msg.type)
 
                         if(wire_msg.type === 'canvas') {
                             canvases.push(wire_msg.canvas!)

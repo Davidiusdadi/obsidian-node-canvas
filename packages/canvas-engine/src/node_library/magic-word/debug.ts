@@ -6,7 +6,7 @@ import {logger} from "../../globals"
 const readLineAsync = (query: string): Promise<string> => {
     const rl = readline.createInterface({
         input: process.stdin,
-        output: process.stdout
+        //output: process.stdout
     });
 
     return new Promise<string>((resolve) => {
@@ -23,8 +23,8 @@ export default {
     compile: async (code) => {
         return async (ctx) => {
             logger.debug('debug input:', ctx.input)
-
-            await readLineAsync('(debug) Press enter to resume...')
+            console.log('(debug) Press enter to resume...')
+            await readLineAsync('no stdout configured')
             return ctx.input
         }
     }

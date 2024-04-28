@@ -9,6 +9,7 @@ export interface GlobalContext {
     introspection?: Introspection
     loaded_files: {
         [file_path: string]: ONode
-    }
+    },
+    parallel?: number
 }
 

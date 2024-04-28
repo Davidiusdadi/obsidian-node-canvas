@@ -48,16 +48,43 @@ export async function gpt_runner_generic(data: z.input<typeof ZSchemaGPT>, ctx: 
 
     const payload = ZSchemaGPT.parse(data)
 
-    logger.debug('GPT payload: ', chalk.yellow(yaml.dump(payload)))
+    logger.debug('GPT payload:', chalk.yellow(yaml.dump(payload, {lineWidth: process.stdout.columns})))
 
-    const completion_config: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming = {
+    const completion_config: OpenAI.Chat.Completions.ChatCompletionCreateParamsStreaming = {
         ...payload,
-
+        stream: true
     }
 
     const chatCompletion = await openai.chat.completions.create(completion_config);
 
-    const response = chatCompletion.choices[0].message.content?.trim()
+    let response = ''
+
+    let attempts = 1
+    while (true) {
+        try {
+            for await (const compl of chatCompletion) {
+                const message = compl.choices[0].delta.content
+
+                if (message) {
+                    response += message
+                    ctx.emit('stream', message)
+                }
+            }
+            break
+        } catch (e) {
+            let max_attempts = 3
+            if (attempts <= max_attempts && e instanceof OpenAI.APIError) {
+                logger.error('OpenAI API Error: ', e)
+                let sleep_sec = 2 ** attempts
+                logger.error(`retrying (${attempts}/${max_attempts}) in ${sleep_sec}s...`)
+                await new Promise((resolve) => setTimeout(resolve, sleep_sec * 1000))
+                attempts++
+                continue
+            }
+            throw e
+        }
+    }
+
 
     return {
         response,
