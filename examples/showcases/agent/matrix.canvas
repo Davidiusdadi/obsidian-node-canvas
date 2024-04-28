@@ -4,20 +4,18 @@
 		{"id":"3ced2abb71a29d71","type":"text","text":"**agent** [[smith.canvas|smith]]\n### system\nYou are the boss and delegate tasks to you colleges \n### tools\n- [[call-agent]]\n\t- [[smith.canvas|smith]]\n### memory\n- [[scratchpad.canvas|scratchpad]]\n\n","x":-120,"y":-719,"width":420,"height":420},
 		{"id":"77cdea767fd6e89f","type":"text","text":"**agent** [[smith.canvas|smith]]\n### system\nYou are \n### tools\n- [[run-shell-invocation.canvas|run-shell-invocation]]\n### memory\n- [[scratchpad.canvas|scratchpad]]\n\n","x":-740,"y":-719,"width":360,"height":420},
 		{"id":"67c1bd5b334f9068","type":"text","text":"> We need to get a docker container up and running and ","x":-300,"y":-1080,"width":300,"height":180},
-		{"id":"f1bda096bd5f2331","type":"text","text":"> here i give my input prompt","x":-1480,"y":-1600,"width":250,"height":60},
-		{"id":"dc37e4880c8cf998","type":"text","text":"","x":-1155,"y":-1600,"width":250,"height":60},
-		{"id":"587b75f3260f0aaa","type":"file","file":"showcases/agent/smith.canvas","x":-1280,"y":-1460,"width":400,"height":400},
-		{"id":"a193987a0266f3b3","x":-680,"y":-1387,"width":250,"height":60,"type":"text","text":""},
-		{"id":"45041f83d875e588","x":-1398,"y":-896,"width":250,"height":60,"type":"text","text":""},
-		{"id":"75f58e1ce61874f1","x":-740,"y":-1090,"width":250,"height":60,"type":"text","text":""}
+		{"id":"65e9c5eee29ffe7d","type":"file","file":"showcases/agent/smith.canvas","x":-700,"y":-1690,"width":400,"height":400},
+		{"id":"cfcf5890f1361f29","type":"text","text":"> here i give my input prompt","x":-1100,"y":-1800,"width":250,"height":60},
+		{"id":"f1bda096bd5f2331","type":"text","text":"> here i give my input prompt","x":-1920,"y":-1800,"width":250,"height":60},
+		{"id":"587b75f3260f0aaa","type":"file","file":"showcases/agent/smith.canvas","x":-1640,"y":-1650,"width":400,"height":400},
+		{"id":"2440a71592ce8989","type":"text","text":"conversation","x":-1100,"y":-1450,"width":250,"height":60}
 	],
 	"edges":[
 		{"id":"8a06d0fff8579022","fromNode":"3ced2abb71a29d71","fromSide":"left","toNode":"abcc6b51bc246b08","toSide":"right"},
 		{"id":"983594a8c793f027","fromNode":"abcc6b51bc246b08","fromSide":"left","toNode":"77cdea767fd6e89f","toSide":"right"},
 		{"id":"64f128efd85d5dfb","fromNode":"f1bda096bd5f2331","fromSide":"bottom","toNode":"587b75f3260f0aaa","toSide":"left","label":"give-task"},
-		{"id":"970dfb15876e5f09","fromNode":"587b75f3260f0aaa","fromSide":"top","toNode":"dc37e4880c8cf998","toSide":"bottom","label":"response"},
-		{"id":"22165ef8768d7805","fromNode":"587b75f3260f0aaa","fromSide":"right","toNode":"a193987a0266f3b3","toSide":"left","toEnd":"none","color":"3"},
-		{"id":"cecf07d8da950c90","fromNode":"587b75f3260f0aaa","fromSide":"bottom","toNode":"45041f83d875e588","toSide":"top","label":"this happend"},
-		{"id":"f7e5b0a08f2aaa94","fromNode":"75f58e1ce61874f1","fromSide":"left","toNode":"587b75f3260f0aaa","toSide":"right"}
+		{"id":"9c6ed6493797e212","fromNode":"cfcf5890f1361f29","fromSide":"right","toNode":"65e9c5eee29ffe7d","toSide":"left","label":"give-task"},
+		{"id":"029210eb6fc08541","fromNode":"587b75f3260f0aaa","fromSide":"right","toNode":"2440a71592ce8989","toSide":"left"},
+		{"id":"1564d1408f0077ae","fromNode":"65e9c5eee29ffe7d","fromSide":"left","toNode":"2440a71592ce8989","toSide":"right"}
 	]
 }

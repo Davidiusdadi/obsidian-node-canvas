@@ -1,24 +1,22 @@
 {
 	"nodes":[
-		{"id":"f70bcccd70759f3c","type":"text","text":"**log** callee started","x":-245,"y":-45,"width":250,"height":60},
-		{"id":"6bcf5525ff11a12b","type":"text","text":"start","x":-173,"y":-200,"width":104,"height":60},
-		{"id":"2ea2dd4dd04392f4","type":"text","text":"```ts\nstate = 1\nreturn 2\n```","x":-460,"y":125,"width":287,"height":80},
-		{"id":"cfa4041fa0079c00","type":"text","text":"```ts\nstate = 3\nreturn 4\n```","x":-92,"y":125,"width":303,"height":80},
-		{"id":"510bb6758d3f7caf","type":"text","text":"**emit-state** signal2","x":-65,"y":280,"width":250,"height":60},
-		{"id":"2e15bbe9302389da","type":"text","text":"```ts\naggregate()\n```","x":-280,"y":460,"width":320,"height":60},
-		{"id":"18a842d2a968ebe1","type":"text","text":"**log** callee is done","x":-245,"y":580,"width":250,"height":60},
-		{"id":"5d08b8e5b7fd6761","type":"text","text":"**on**: example-in","x":40,"y":-200,"width":200,"height":60},
-		{"id":"1da991a70beb4502","type":"text","text":"**emit** signal1","x":-441,"y":280,"width":250,"height":60}
+		{"id":"2ea2dd4dd04392f4","type":"text","text":"```ts\nstate.lane = 'loop'\nstate.i++;\nreturn 'loop'\n```","x":-720,"y":125,"width":372,"height":135},
+		{"id":"cfa4041fa0079c00","type":"text","text":"```ts\nstate.lane = 'mutate-state'\nstate.i += 10\nreturn 'mutate-state'\n```","x":-316,"y":125,"width":372,"height":135},
+		{"id":"147bd342ef636a8f","type":"text","text":"**inject**: injection","x":100,"y":125,"width":340,"height":135},
+		{"id":"1da991a70beb4502","type":"text","text":"**emit** output","x":-255,"y":460,"width":250,"height":60},
+		{"id":"5d08b8e5b7fd6761","type":"text","text":"**on**: call","x":-820,"y":-200,"width":200,"height":60},
+		{"id":"e91d43a978d07023","type":"text","text":"**log** on call: \ninput: {{input | json}}\nstate: {{state | json}}\n","x":-745,"y":-72,"width":250,"height":115},
+		{"id":"6bcf5525ff11a12b","type":"text","text":"start","x":-182,"y":-420,"width":104,"height":60},
+		{"id":"f70bcccd70759f3c","type":"text","text":"**log** call {{state.test}}","x":-255,"y":-280,"width":250,"height":60}
 	],
 	"edges":[
 		{"id":"c8c0b29e61c6bac5","fromNode":"6bcf5525ff11a12b","fromSide":"bottom","toNode":"f70bcccd70759f3c","toSide":"top"},
-		{"id":"fb1e8ddc0aa58b5e","fromNode":"f70bcccd70759f3c","fromSide":"bottom","toNode":"2ea2dd4dd04392f4","toSide":"top"},
-		{"id":"ae92a7968efcdc9e","fromNode":"1da991a70beb4502","fromSide":"bottom","toNode":"2e15bbe9302389da","toSide":"top"},
-		{"id":"2aa25fbef6f2a977","fromNode":"510bb6758d3f7caf","fromSide":"bottom","toNode":"2e15bbe9302389da","toSide":"top"},
-		{"id":"3d8e90f7d4f4a6f9","fromNode":"2e15bbe9302389da","fromSide":"bottom","toNode":"18a842d2a968ebe1","toSide":"top"},
-		{"id":"1b28f1e4e6e3973a","fromNode":"f70bcccd70759f3c","fromSide":"bottom","toNode":"cfa4041fa0079c00","toSide":"top"},
 		{"id":"660fca963ee9d0d0","fromNode":"2ea2dd4dd04392f4","fromSide":"bottom","toNode":"1da991a70beb4502","toSide":"top"},
-		{"id":"5c6b6af2e768766d","fromNode":"cfa4041fa0079c00","fromSide":"bottom","toNode":"510bb6758d3f7caf","toSide":"top"},
-		{"id":"f8e90a1f306da7db","fromNode":"5d08b8e5b7fd6761","fromSide":"bottom","toNode":"cfa4041fa0079c00","toSide":"top"}
+		{"id":"8b3d592e7f96d8fa","fromNode":"147bd342ef636a8f","fromSide":"bottom","toNode":"1da991a70beb4502","toSide":"top"},
+		{"id":"3a78f3ae7c7b60ec","fromNode":"f70bcccd70759f3c","fromSide":"bottom","toNode":"147bd342ef636a8f","toSide":"top"},
+		{"id":"dd0010664ed745b3","fromNode":"5d08b8e5b7fd6761","fromSide":"bottom","toNode":"e91d43a978d07023","toSide":"top"},
+		{"id":"ccd571c4ba2957b6","fromNode":"e91d43a978d07023","fromSide":"bottom","toNode":"2ea2dd4dd04392f4","toSide":"top"},
+		{"id":"b9ceac7133f81de9","fromNode":"f70bcccd70759f3c","fromSide":"bottom","toNode":"cfa4041fa0079c00","toSide":"top"},
+		{"id":"30e01c3afac3ba33","fromNode":"cfa4041fa0079c00","fromSide":"right","toNode":"147bd342ef636a8f","toSide":"left"}
 	]
 }

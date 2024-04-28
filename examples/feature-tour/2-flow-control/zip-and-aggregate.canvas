@@ -6,7 +6,7 @@
 		{"id":"f0b9fdb709d7430d","type":"text","text":"```ts\nconst inputs = aggregate().list()\n\nconsole.log('counter vals:', inputs)\nconsole.log('b: counter now', input)\n```","x":820,"y":533,"width":480,"height":167},
 		{"id":"4f3293d8c9e8f499","type":"text","text":"```ts\naggregate()\n```","x":886,"y":958,"width":314,"height":83},
 		{"id":"f7fd42e3afd1fb4d","type":"text","text":"**log** all aggregates completed","x":860,"y":1120,"width":367,"height":60},
-		{"id":"c0a7a2db1dda4c5d","type":"text","text":"```ts\naggregate()\n```","x":401,"y":1240,"width":314,"height":83},
+		{"id":"c0a7a2db1dda4c5d","type":"text","text":"```ts\nreturn aggregate().list()\n```","x":401,"y":1240,"width":314,"height":83},
 		{"id":"a7b72ff5dad61f82","type":"text","text":"**log** Everything completed ","x":401,"y":1380,"width":314,"height":50},
 		{"id":"99f1766f28d485ca","type":"text","text":"**Merge order can not yet not be controlled.** \n\nMerge order is currently goes by invocation order which is a runtime implementation detail that likely to change . \nIn the future there might be a way to mark an edge's merge / list precedence.\n","x":361,"y":-100,"width":445,"height":220,"color":"2"},
 		{"id":"c497949d9beaf0d0","type":"text","text":"**log**  count: {{input}}","x":1340,"y":587,"width":300,"height":60},

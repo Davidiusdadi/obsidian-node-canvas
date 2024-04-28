@@ -2,11 +2,11 @@
 	"nodes":[
 		{"id":"1f6829180234712b","type":"text","text":"```ts\nreturn {\n    id: 'a', \n    key2: 'key2'\n}\n``` ","x":-495,"y":-372,"width":236,"height":140},
 		{"id":"3c795494b7d50d92","type":"text","text":"```ts\nreturn {\n    id: 'a', \n    key1: 'key1'\n}\n``` ","x":-781,"y":-372,"width":250,"height":140},
-		{"id":"d6828590bc7e2628","x":-577,"y":-540,"width":114,"height":60,"type":"text","text":"start"},
+		{"id":"d6828590bc7e2628","type":"text","text":"start","x":-577,"y":-540,"width":114,"height":60},
 		{"id":"f0a8aed013f8b831","type":"text","text":"```ts\nconst obj = zipOnInput('id').merge()\n```\n`obj`  will be:\n\n```json\n{\n    id: 'a', \n    key1: 'key1',\n    key2: 'key2'\n}\n```","x":-781,"y":-120,"width":522,"height":280},
 		{"id":"43ff08d010bfc322","type":"text","text":"```ts\nfor(let i = 0; i < 10; i++){\n    emit('count', {\n        id: i, \n        num: i,\n        side_b: true\n    })\n}\n``` \n\ncounts to **10**","x":-480,"y":260,"width":379,"height":260},
 		{"id":"3c938f85c78b130e","type":"text","text":"```ts\nfor(let i = 0; i < 3; i++){\n    emit('count', {\n        id: i, \n        num: i,\n        side_a: true\n    })\n}\n``` \n\ncounts to **3**","x":-900,"y":260,"width":380,"height":260},
-		{"id":"f33478014b019051","x":-817,"y":620,"width":595,"height":280,"type":"text","text":"```ts\nconst list = zipOnInput('id').merge()\nconsole.log(list)\n```\nonly 3 zips will come in here because the others will not have a matching invocation on the other side.\n```js\n{ id: 0, num: 0, side_a: true, side_b: true }\n{ id: 1, num: 1, side_a: true, side_b: true }\n{ id: 2, num: 2, side_a: true, side_b: true }\n```\n"}
+		{"id":"f33478014b019051","type":"text","text":"```ts\nconst list = zipOnInput('id').merge()\nconsole.log(list)\nreturn list\n```\nonly 3 zips will come in here because the others will not have a matching invocation on the other side.\n```js\n{ id: 0, num: 0, side_a: true, side_b: true }\n{ id: 1, num: 1, side_a: true, side_b: true }\n{ id: 2, num: 2, side_a: true, side_b: true }\n```\n","x":-817,"y":620,"width":595,"height":300}
 	],
 	"edges":[
 		{"id":"668293481a34b639","fromNode":"3c795494b7d50d92","fromSide":"bottom","toNode":"f0a8aed013f8b831","toSide":"top"},
