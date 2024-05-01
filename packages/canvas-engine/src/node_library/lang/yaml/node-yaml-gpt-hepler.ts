@@ -4,6 +4,7 @@ import {CTX} from "../../../runtime/runtime-types"
 import {logger} from "../../../globals"
 import chalk from "chalk"
 import yaml from "js-yaml"
+import _ from "lodash"
 
 const prefix = process.env.LLM_PROVIDER ?? 'OPENAI'
 const LLM_CONFIG = {
@@ -55,20 +56,67 @@ export async function gpt_runner_generic(data: z.input<typeof ZSchemaGPT>, ctx: 
         stream: true
     }
 
+    // mistral does not support stop -- so we need to impl. it ourselves
+    let stop = _.flatten([completion_config.stop!])
+        .filter(s => s !== undefined && s !== null)
+
+    if (prefix === 'MISTRAL') {
+        if (_.last(completion_config.messages)?.role === 'assistant') {
+            const last = completion_config.messages.pop()
+            if (last) {
+                const new_last = _.last(completion_config.messages!)
+                if (!new_last || !new_last.content || typeof new_last.content !== 'string') {
+                    throw new Error('last message is not assistant')
+                }
+                new_last!.content! += last!.content!
+            }
+        }
+    }
+
     const chatCompletion = await openai.chat.completions.create(completion_config);
 
     let response = ''
 
     let attempts = 1
-    while (true) {
-        try {
-            for await (const compl of chatCompletion) {
-                const message = compl.choices[0].delta.content
 
-                if (message) {
-                    response += message
-                    ctx.emit('stream', message)
+    streaming: while (true) {
+        try {
+
+            let buffer = '';
+            let max_stop = _.max(stop.map(s => s.length)) ?? 0
+            let message = ''
+
+            unspool: for await (const compl of chatCompletion) {
+                const chunk = compl.choices[0].delta.content
+
+                if (chunk) {
+                    for (const c of chunk) {
+                        buffer += c
+                        for (const s of stop) {
+                            if (buffer.includes(s)) {
+                                buffer = buffer.split(s)[0]
+                                break unspool
+                            }
+                        }
+                        if (buffer.length === max_stop) {
+                            message+=buffer[0]
+                            buffer = buffer.slice(1)
+                        }
+                    }
+
+                    if (message) {
+                        response += message
+                        ctx.emit('stream', message)
+                        message = ''
+                    }
+
                 }
+            }
+            // empty buffer on completion
+            if (buffer) {
+                response += buffer
+                ctx.emit('stream', buffer)
+                buffer = ''
             }
             break
         } catch (e) {
@@ -81,6 +129,7 @@ export async function gpt_runner_generic(data: z.input<typeof ZSchemaGPT>, ctx: 
                 attempts++
                 continue
             }
+            logger.error('LLM API Error: ', e)
             throw e
         }
     }
