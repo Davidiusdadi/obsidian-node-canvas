@@ -11,19 +11,22 @@
 
         if (onode.type === 'text') {
             html = mdToHtml(onode.text)
-        } else if(onode.type === 'file') {
+        } else if (onode.type === 'file') {
             const file_name = onode.file.match(/(.+\/)?([^/]+?\..+)$/)
             html = `<div class="flex items-center justify-center">
 <div>
 <b class="text-orange-600">file-ref</b>
-<code>${file_name?.[2] }</code>
+<code>${file_name?.[2]}</code>
 in <span class="opacity-50">
     <code>${file_name?.[1]}</code>
 </span>
 </div>
 </div>`
-        }
-        else {
+        } else if (onode.type === 'group') {
+            html = `
+            <div class="absolute top-[-1.5em]">${onode.label}</div>
+            `
+        } else {
             html = onode.type
         }
     }

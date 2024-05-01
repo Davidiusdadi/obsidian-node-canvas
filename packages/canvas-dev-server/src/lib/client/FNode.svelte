@@ -45,17 +45,17 @@
 <div
     style:width={Intededwidth}
     style:height={Intededheight}
-    class="border-gray rounded-lg bg-white overflow-y-auto shadow-slate-300 box-content"
+    class="border-gray rounded-lg  overflow-y-auto shadow-slate-300 box-content"
     style:border-color={color(data.original.color)}
-    style:background-color={Color(color(data.original.color)).lighten(0.74).hex()
-    }
+
     class:border-2={!step_frame}
     class:border-4={step_frame}
+    style:background-color={ data.original.type === 'group' ? 'bg-transparent' : Color(color(data.original.color)).lighten(0.74).hex()}
 >
     <div class="absolute top-1 right-1 text-2xl" class:hidden={on_stack === 0}>
         <span
             class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"
-              class:hidden={!step_frame}>
+            class:hidden={!step_frame}>
         </span>
         <Icon icon="mdi:timer-sand-complete"/>
     </div>
