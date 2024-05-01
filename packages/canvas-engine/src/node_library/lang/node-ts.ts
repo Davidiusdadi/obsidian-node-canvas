@@ -43,7 +43,7 @@ export async function ts_to_js(ts_code: string) {
 
 export default {
     lang: 'ts',
-    compile: async (code, ctx, global_context) => {
-        return js_to_fn(await ts_to_js(code), global_context)
+    compile: async (code, {gctx}) => {
+        return js_to_fn(await ts_to_js(code), gctx)
     }
 } satisfies NodeCompiler

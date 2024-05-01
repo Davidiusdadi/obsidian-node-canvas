@@ -95,6 +95,6 @@ function transformObjectStrings(obj: any, transformString: (v: string) => any): 
 export default {
     lang: 'yaml',
     compile: async (code, context) => {
-        return yaml_to_fn(code, context)
+        return yaml_to_fn(code, context.ectx)
     }
 } satisfies NodeCompiler

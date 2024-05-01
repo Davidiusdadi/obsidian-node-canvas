@@ -3,7 +3,7 @@ import {NodeCompiler} from "../../compile/template"
 
 export default {
     lang: 'js',
-    compile: async (code,context,global_context) => {
-        return js_to_fn(code, global_context)
+    compile: async (code, {gctx}) => {
+        return js_to_fn(code, gctx)
     }
 } satisfies NodeCompiler
