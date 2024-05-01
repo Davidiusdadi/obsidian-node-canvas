@@ -10,8 +10,9 @@ import emitInput from "../node_library/magic-word/canvas-io/emit-input"
 import {NodeReturnNotIntendedByDesign} from "../runtime/errors"
 import {GlobalContext} from "../types"
 import {OEdge} from "./canvas-edge-transform"
-import inject, {InjectFn} from "../node_library/magic-word/canvas-io/inject"
+import inject from "../node_library/magic-word/canvas-io/inject"
 import {DMsgCanvas} from "../runtime/inspection/protocol"
+import {InjectONode} from "../node_library/magic-word/canvas-io/return"
 
 type FileNode = Extract<ONode, { type: 'file' }>
 
@@ -87,11 +88,10 @@ export async function loadFileNode(node: FileNode, ectx: ExecutionContext, gctx:
                                 })
                             }
                         } else if (node.compiler?.lang === inject.lang) {
-
-                            const sub_fn = node.fn as InjectFn
+                            const inject_node = node as InjectONode
 
                             const node_overloads = overloads.filter((jank) => {
-                                return jank.top_jank_edge.label?.trim().toLowerCase() === sub_fn.inject_name
+                                return jank.top_jank_edge.label?.trim().toLowerCase() === inject_node.inject_name
                             })
 
                             node.fn = function (sub_ctx: CTX) {
