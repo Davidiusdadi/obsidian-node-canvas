@@ -1,26 +1,27 @@
 {
 	"nodes":[
 		{"id":"b6da9ce008208d67","type":"text","text":"**on**: use-tool","x":-179,"y":-480,"width":250,"height":60,"color":"6"},
-		{"id":"f053da7a04753806","type":"text","text":"```ts\nconst regex = /.*action:\\s+\\[?(.+)\\]?\\s*\\n+action input:\\s+(.+)/im\nconst match = input.match(regex)\nif(match) {\n   state.use_tool = match[1]\n   return match[2]\n} else {\n   state.use_tool = '<bad-tool>'\n   return input\n}\n```","x":-520,"y":-324,"width":919,"height":284},
+		{"id":"f053da7a04753806","type":"text","text":"```ts\nconst regex = /.*action:\\s+\\[?(.+)\\]?\\s*action input:\\s+(.+)/im\nconst match = input.match(regex)\nif(match) {\n   state.use_tool = match[1].trim()\n   return match[2]\n} else {\n   state.use_tool = '<bad-tool>'\n   return input\n}\n```","x":-520,"y":-324,"width":919,"height":284},
 		{"id":"8581ed632b3f20d5","type":"text","text":"# run bash!!!\n```bash\n{{input}}\n```","x":-946,"y":848,"width":340,"height":155,"color":"2"},
-		{"id":"fc895f151905ad89","type":"text","text":"```ts\nreturn ''\n```","x":-901,"y":1104,"width":250,"height":60},
-		{"id":"4f6b9c2cc1b4bf00","type":"text","text":"join outputs together - merging pipes\n```ts\nconst res= aggregate().list().join('\\n')\nstate = state[0]\nreturn res\n```","x":-1006,"y":1267,"width":460,"height":220},
+		{"id":"4f6b9c2cc1b4bf00","type":"text","text":"join outputs together - merging pipes\n```ts\nconst res= aggregate().list().join('')\nstate = state[0]\nreturn res\n```","x":-1006,"y":1267,"width":460,"height":220},
 		{"id":"3c5929be423d7d64","type":"text","text":"**log**: bash output: \n{{input | blue}}","x":-901,"y":1660,"width":250,"height":60},
 		{"id":"4414a9a0eb028596","type":"text","text":"**switch**:  state.use_tool ","x":-199,"y":280,"width":265,"height":60},
-		{"id":"74427e75a3cd60eb","type":"text","text":"```ts\nreturn `\n> Tool invocation failed.\n> Failed to detect tool name.\n> Available tools: ${state.tool_names}\n\n`\n```","x":740,"y":215,"width":580,"height":190},
+		{"id":"74427e75a3cd60eb","type":"text","text":"```ts\nreturn `\nError: tool invocations start with \"Action:\"\nPlz fix the tool invocation.\n`\n```","x":740,"y":215,"width":580,"height":190},
 		{"id":"e37c94f0c5840d5c","type":"text","text":"","x":855,"y":1401,"width":250,"height":60},
 		{"id":"1a0926156043e39d","type":"text","text":"```ts\nreturn `\n> Error \"${state.use_tool.slice(0,10)}...\" is not a valid tool name!\n> Available Tools: ${state.tool_names}\n`\n```","x":-340,"y":848,"width":533,"height":212},
 		{"id":"6b030ea93883dbff","type":"text","text":"**log**: ⚒️ using {{  '\\n' + state.use_tool  | red}}","x":-249,"y":100,"width":409,"height":60,"color":"2"},
 		{"id":"0228e9dff79b59e2","type":"text","text":"**emit**: tool-resp","x":-160,"y":1740,"width":250,"height":60,"color":"6"},
 		{"id":"c3e6e9b5dcc2ea96","type":"text","text":"**log**:  {{input | blue}}","x":376,"y":954,"width":250,"height":60,"color":"2"},
-		{"id":"9637b102f1477d1a","type":"text","text":"**question**: ❓: {{input}}\n$>","x":340,"y":768,"width":321,"height":80}
+		{"id":"9637b102f1477d1a","type":"text","text":"**question**: ❓: {{input}}\n$>","x":340,"y":768,"width":321,"height":80},
+		{"id":"fc895f151905ad89","type":"text","text":"```ts\nreturn ''\n```","x":-901,"y":1147,"width":250,"height":60},
+		{"id":"7ef27b20e520b3a9","type":"text","text":"```ts\nimport chalk from 'chalk'\nprocess.stdout.write(input)\nreturn input\n```","x":-1560,"y":1111,"width":494,"height":133}
 	],
 	"edges":[
 		{"id":"b0318d48a2c825bb","fromNode":"b6da9ce008208d67","fromSide":"bottom","toNode":"f053da7a04753806","toSide":"top"},
 		{"id":"734f766f75846f34","fromNode":"4414a9a0eb028596","fromSide":"left","toNode":"8581ed632b3f20d5","toSide":"top","label":"\"bash\""},
 		{"id":"8604c58cbe0dbe1d","fromNode":"4414a9a0eb028596","fromSide":"bottom","toNode":"1a0926156043e39d","toSide":"top","label":"else"},
-		{"id":"831503e6d4933d0d","fromNode":"8581ed632b3f20d5","fromSide":"left","toNode":"4f6b9c2cc1b4bf00","toSide":"left","label":"stdout"},
-		{"id":"df952c13c9c0caac","fromNode":"8581ed632b3f20d5","fromSide":"right","toNode":"4f6b9c2cc1b4bf00","toSide":"right","label":"stderr"},
+		{"id":"831503e6d4933d0d","fromNode":"8581ed632b3f20d5","fromSide":"left","toNode":"7ef27b20e520b3a9","toSide":"top","label":"stdout"},
+		{"id":"df952c13c9c0caac","fromNode":"8581ed632b3f20d5","fromSide":"bottom","toNode":"7ef27b20e520b3a9","toSide":"top","label":"stderr"},
 		{"id":"f547b71c95521753","fromNode":"4f6b9c2cc1b4bf00","fromSide":"bottom","toNode":"3c5929be423d7d64","toSide":"top"},
 		{"id":"543e5088887441af","fromNode":"3c5929be423d7d64","fromSide":"right","toNode":"0228e9dff79b59e2","toSide":"left"},
 		{"id":"53c8caf7eb1499d1","fromNode":"8581ed632b3f20d5","fromSide":"bottom","toNode":"fc895f151905ad89","toSide":"top"},
@@ -33,6 +34,7 @@
 		{"id":"92a0da413be4d0ad","fromNode":"4414a9a0eb028596","fromSide":"right","toNode":"74427e75a3cd60eb","toSide":"left","label":"\"<bad-tool>\""},
 		{"id":"aab41ddbc13137fe","fromNode":"6b030ea93883dbff","fromSide":"bottom","toNode":"4414a9a0eb028596","toSide":"top"},
 		{"id":"f4adc43e457378c8","fromNode":"74427e75a3cd60eb","fromSide":"bottom","toNode":"e37c94f0c5840d5c","toSide":"top"},
-		{"id":"051f044eda303774","fromNode":"e37c94f0c5840d5c","fromSide":"bottom","toNode":"0228e9dff79b59e2","toSide":"right"}
+		{"id":"051f044eda303774","fromNode":"e37c94f0c5840d5c","fromSide":"bottom","toNode":"0228e9dff79b59e2","toSide":"right"},
+		{"id":"e529a4d621d5526c","fromNode":"7ef27b20e520b3a9","fromSide":"bottom","toNode":"4f6b9c2cc1b4bf00","toSide":"left"}
 	]
 }
