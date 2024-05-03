@@ -1,0 +1,18 @@
+{
+	"nodes":[
+		{"id":"19dbef8d1cab897c","type":"text","text":"```ts\nreturn {\n   question: \"What is my OS version?\"\n}\n```","x":-840,"y":-760,"width":500,"height":120},
+		{"id":"d1bc397ca9927711","type":"text","text":"```yaml\nmodel: \"gpt-3.5-turbo\"\nmessages:\n - role: \"system\"\n   content: >\n\tYou are bash terminal. \n\tThe user specifies his intention.\n\tYou produce the bash code.\n\t\n\tReject all requests to change anything.\n\tNo changes to environment, file or the system in general.\n\tYou are only allowd reading access.\n\tReject requests by just giving `exit 69;`\n\tIf alls good `exit 0`\n\t```\n - role: \"user\"\n   content: \"{{input.question}}\"\n```\n\n\n","x":-944,"y":-560,"width":708,"height":420},
+		{"id":"3c59a61cb36a6eb8","type":"text","text":"```ts\nconst c = this.conv = this.conv ?? []\n\nc.push('>', input.previous.trim())\nc.push('agent:', input.response.trim())\n\nstate.history = c.join('\\n')\n```","x":-160,"y":-198,"width":466,"height":240},
+		{"id":"3857a7ff0df57bb5","type":"text","text":"**log** {{input}}","x":-833,"y":-78,"width":487,"height":160,"color":"#143bff"},
+		{"id":"fa8d7baa8a1797da","type":"text","text":"```bash\n{{input}}\n```","x":-717,"y":220,"width":371,"height":140},
+		{"id":"186bd0d14d6df121","type":"text","text":"**log** {{input}}","x":-702,"y":460,"width":356,"height":68},
+		{"id":"f9600a39c1822868","type":"text","text":"start","x":-641,"y":-900,"width":103,"height":50}
+	],
+	"edges":[
+		{"id":"820ec138fe03b507","fromNode":"d1bc397ca9927711","fromSide":"bottom","toNode":"3857a7ff0df57bb5","toSide":"top"},
+		{"id":"7438dd8b0f97ce69","fromNode":"19dbef8d1cab897c","fromSide":"bottom","toNode":"d1bc397ca9927711","toSide":"top"},
+		{"id":"32eb76533f94559e","fromNode":"f9600a39c1822868","fromSide":"bottom","toNode":"19dbef8d1cab897c","toSide":"top"},
+		{"id":"24828ec9f5506964","fromNode":"3857a7ff0df57bb5","fromSide":"bottom","toNode":"fa8d7baa8a1797da","toSide":"top"},
+		{"id":"ee57e5e7787c27ba","fromNode":"fa8d7baa8a1797da","fromSide":"bottom","toNode":"186bd0d14d6df121","toSide":"top","label":"stdout"}
+	]
+}

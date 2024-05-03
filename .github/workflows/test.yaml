@@ -1,0 +1,27 @@
+name: Yarn Test
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: setup bun
+        uses: oven-sh/setup-bun@v1
+      - name: install dependencies
+        run: bun install
+      - name: run tests
+        run: |
+          cd  packages/canvas-engine
+          bun test
+      - name: test build
+        run: |
+          cd  packages/canvas-engine
+          bun run build:lib

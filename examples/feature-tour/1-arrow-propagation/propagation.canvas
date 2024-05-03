@@ -1,0 +1,37 @@
+{
+	"nodes":[
+		{"id":"312705e29b96a272","type":"text","text":"start","x":-508,"y":-609,"width":121,"height":60,"color":"6"},
+		{"id":"79d4cebb7bb90a06","type":"text","text":"Here we print `input` and `state`!\n```ts\nconsole.log(input) // 2\nconsole.log(state.foo) // bar\nreturn 3\n```\n\nWe do not modify `state` - it is however anyways forwarded.","x":-225,"y":-240,"width":470,"height":240},
+		{"id":"e3d8cad7405cd110","type":"text","text":"```ts\nconsole.log(input) // 3\nconsole.log(state.foo) // bar\nreturn 10\n```","x":-225,"y":120,"width":470,"height":160},
+		{"id":"74e896e3e37fe457","type":"text","text":"","x":-1097,"y":466,"width":50,"height":50},
+		{"id":"af7d21a7d4da246a","type":"text","text":"empty node just for a cleaner look.\n`state` and `input` are both forwarded","x":-1030,"y":415,"width":207,"height":153,"color":"5"},
+		{"id":"a043b5759b55375f","type":"text","text":"```ts\nconsole.log(input) // 7\nconsole.log(state.foo) // B\n\n```","x":-881,"y":200,"width":340,"height":120},
+		{"id":"ff232e68056c62e7","type":"text","text":"There are 2 special variables:\n- `input` - the value received via an arrow\n- `state` - starting out as `{}` it can be reassigned \n\t- it is [shallowly cloned](https://lodash.com/docs/4.17.15#clone) whenever it is passed on\n```ts\nconsole.log(input) // undefined\nstate = {\n  foo: 'bar'\n}\nconst local_var = 'local_var'\nreturn 2\n```","x":-255,"y":-717,"width":500,"height":354},
+		{"id":"04690b6c718c409b","type":"text","text":"`state` and `input` passed on","x":41,"y":-320,"width":204,"height":60,"color":"5"},
+		{"id":"2b63c752ded0afb8","type":"text","text":"you will learn - the *boring basics*:\n- how nodes receive input\n- how `state` propagates along arrows\n- how to use arrows\n- how to use **named arrows**\n- how to use the `this` variable","x":-1145,"y":-728,"width":529,"height":238,"color":"5"},
+		{"id":"dd5b074f7ac37197","type":"text","text":"`emit` is another way to send `state` and `input` along named arrows. \n\n```ts\nconsole.log(input) // 3\nconsole.log(state.foo) // bar\nemit('a', 5)\nstate.foo = 'A'\nemit('b', 6)\nstate.foo = 'B'\nreturn 7\n```","x":-914,"y":-460,"width":406,"height":300},
+		{"id":"76f7c024f19dd178","type":"text","text":"```ts\nconsole.log(input) // 5\nconsole.log(state.foo) // A\n// return undefined\n```","x":-1145,"y":-20,"width":340,"height":120},
+		{"id":"1a8f4d78596a33bb","type":"text","text":"```ts\nconsole.log(input) // 6\nconsole.log(state.foo) // B\nreturn  input\n```","x":-617,"y":-20,"width":340,"height":120},
+		{"id":"3c07b23f84c68f41","type":"text","text":"","x":-360,"y":200,"width":50,"height":50},
+		{"id":"723bbd9e2d66d791","type":"text","text":"different `state` versions passed on","x":-1145,"y":-160,"width":204,"height":60,"color":"5"},
+		{"id":"3ec3bc45cac87c5c","type":"text","text":"This node will called **5** times - once form each in-arrow.\n```ts\nconsole.log(input) // ...\nconsole.log(state.foo) // ...\n\nemit('x', input)\nemit('x', state.foo)\n\nreturn 42 // this is never used \n```\n\n- the `42` is never used as there is no unnamed outgoing arrow.\n- other ways to await / join incoming arrows will be showin in [[zip-demo.canvas|zip-demo]] and [[zip-and-aggregate.canvas|zip-and-aggregate]]","x":-711,"y":460,"width":470,"height":400,"color":"6"},
+		{"id":"c318b1f3ef183b07","type":"text","text":"This node will called **10** times.\nAs the `emit`  is called 2 times in the previous node.\n\n`this` can be used to preserve a variable across multiple invocations.\n\n```ts\nthis.i = (this.i ?? 0) + 1\n\nconsole.log('called', this.i)\n\nreturn this.i\n```","x":-140,"y":488,"width":385,"height":372}
+	],
+	"edges":[
+		{"id":"67433558d47dc9b1","fromNode":"312705e29b96a272","fromSide":"right","toNode":"ff232e68056c62e7","toSide":"left"},
+		{"id":"9f417c6d86136d78","fromNode":"ff232e68056c62e7","fromSide":"bottom","toNode":"79d4cebb7bb90a06","toSide":"top"},
+		{"id":"88ea517f38cb8bb4","fromNode":"79d4cebb7bb90a06","fromSide":"left","toNode":"dd5b074f7ac37197","toSide":"right"},
+		{"id":"8a9abb41e8e0623e","fromNode":"79d4cebb7bb90a06","fromSide":"bottom","toNode":"e3d8cad7405cd110","toSide":"top"},
+		{"id":"7939cfc621b90d66","fromNode":"dd5b074f7ac37197","fromSide":"bottom","toNode":"76f7c024f19dd178","toSide":"top","label":"a"},
+		{"id":"0f86025acaf98d6a","fromNode":"dd5b074f7ac37197","fromSide":"bottom","toNode":"1a8f4d78596a33bb","toSide":"top","label":"b"},
+		{"id":"0c903cbe31e43c33","fromNode":"dd5b074f7ac37197","fromSide":"bottom","toNode":"a043b5759b55375f","toSide":"top"},
+		{"id":"7a077fa13115c115","fromNode":"1a8f4d78596a33bb","fromSide":"bottom","toNode":"3ec3bc45cac87c5c","toSide":"top"},
+		{"id":"24621476d771e47f","fromNode":"e3d8cad7405cd110","fromSide":"bottom","toNode":"3ec3bc45cac87c5c","toSide":"top"},
+		{"id":"95bac9b4264ee8f2","fromNode":"76f7c024f19dd178","fromSide":"bottom","toNode":"74e896e3e37fe457","toSide":"top"},
+		{"id":"71d3e167cd0dd9df","fromNode":"74e896e3e37fe457","fromSide":"bottom","toNode":"3ec3bc45cac87c5c","toSide":"left"},
+		{"id":"d4d4b083fbb342b0","fromNode":"a043b5759b55375f","fromSide":"bottom","toNode":"3ec3bc45cac87c5c","toSide":"top"},
+		{"id":"c2fef52f6fbcdece","fromNode":"79d4cebb7bb90a06","fromSide":"bottom","toNode":"3c07b23f84c68f41","toSide":"top"},
+		{"id":"77424283215a8854","fromNode":"3c07b23f84c68f41","fromSide":"bottom","toNode":"3ec3bc45cac87c5c","toSide":"top"},
+		{"id":"0449712e6fb01b6a","fromNode":"3ec3bc45cac87c5c","fromSide":"right","toNode":"c318b1f3ef183b07","toSide":"left","label":"x"}
+	]
+}

@@ -1,0 +1,22 @@
+{
+	"nodes":[
+		{"id":"2ea2dd4dd04392f4","type":"text","text":"```ts\nstate.lane = 'loop'\nstate.i++;\nreturn 'loop'\n```","x":-720,"y":125,"width":372,"height":135},
+		{"id":"cfa4041fa0079c00","type":"text","text":"```ts\nstate.lane = 'mutate-state'\nstate.i += 10\nreturn 'mutate-state'\n```","x":-316,"y":125,"width":372,"height":135},
+		{"id":"147bd342ef636a8f","type":"text","text":"**inject**: injection","x":100,"y":125,"width":340,"height":135},
+		{"id":"1da991a70beb4502","type":"text","text":"**emit** output","x":-255,"y":460,"width":250,"height":60},
+		{"id":"5d08b8e5b7fd6761","type":"text","text":"**on**: call","x":-820,"y":-200,"width":200,"height":60},
+		{"id":"e91d43a978d07023","type":"text","text":"**log** on call: \ninput: {{input | json}}\nstate: {{state | json}}\n","x":-745,"y":-72,"width":250,"height":115},
+		{"id":"6bcf5525ff11a12b","type":"text","text":"start","x":-182,"y":-420,"width":104,"height":60},
+		{"id":"f70bcccd70759f3c","type":"text","text":"**log** call {{state.test}}","x":-255,"y":-280,"width":250,"height":60}
+	],
+	"edges":[
+		{"id":"c8c0b29e61c6bac5","fromNode":"6bcf5525ff11a12b","fromSide":"bottom","toNode":"f70bcccd70759f3c","toSide":"top"},
+		{"id":"660fca963ee9d0d0","fromNode":"2ea2dd4dd04392f4","fromSide":"bottom","toNode":"1da991a70beb4502","toSide":"top"},
+		{"id":"8b3d592e7f96d8fa","fromNode":"147bd342ef636a8f","fromSide":"bottom","toNode":"1da991a70beb4502","toSide":"top"},
+		{"id":"3a78f3ae7c7b60ec","fromNode":"f70bcccd70759f3c","fromSide":"bottom","toNode":"147bd342ef636a8f","toSide":"top"},
+		{"id":"dd0010664ed745b3","fromNode":"5d08b8e5b7fd6761","fromSide":"bottom","toNode":"e91d43a978d07023","toSide":"top"},
+		{"id":"ccd571c4ba2957b6","fromNode":"e91d43a978d07023","fromSide":"bottom","toNode":"2ea2dd4dd04392f4","toSide":"top"},
+		{"id":"b9ceac7133f81de9","fromNode":"f70bcccd70759f3c","fromSide":"bottom","toNode":"cfa4041fa0079c00","toSide":"top"},
+		{"id":"30e01c3afac3ba33","fromNode":"cfa4041fa0079c00","fromSide":"right","toNode":"147bd342ef636a8f","toSide":"left"}
+	]
+}
