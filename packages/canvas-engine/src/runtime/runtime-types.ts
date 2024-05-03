@@ -1,4 +1,4 @@
-import {ONode} from "../compile/canvas-node-transform"
+import {ONode, RuntimeONode} from "../compile/canvas-node-transform"
 import {OEdge} from "../compile/canvas-edge-transform"
 import {InputsFilterJoiner} from "./joins"
 import {ExecutableCanvas} from "./ExecutableCanvas"
@@ -7,13 +7,13 @@ import {zz} from "./helper"
 import {MsgRunner2Inspector, runner2inspector} from "./inspection/protocol"
 import { GlobalContext } from "../types"
 
-export type CTX = {
+export type CTX<T extends object = {}> = {
     emit: (label: string | undefined, value: any) => void
     input: any
     vault_dir: string
     _this: FnThis
     state: any,
-    self_canvas_node: ONode
+    self_canvas_node: RuntimeONode<T>
     self_canvas_nodes: ExecutableCanvas
     updateInput: (new_input: any) => void
     updateState: (new_state: any) => void,

@@ -1,4 +1,4 @@
-import {ONode} from "./canvas-node-transform"
+import {ONode, ONodeFile} from "./canvas-node-transform"
 import {ExecutionContext} from "./types"
 import path from "node:path"
 import {readFile} from "fs/promises"
@@ -13,16 +13,17 @@ import {OEdge} from "./canvas-edge-transform"
 import inject from "../node_library/magic-word/canvas-io/inject"
 import {DMsgCanvas} from "../runtime/inspection/protocol"
 import {InjectONode} from "../node_library/magic-word/canvas-io/return"
+import {CompilationContext} from "./template"
 
-type FileNode = Extract<ONode, { type: 'file' }>
+export type FileNode = Extract<ONode, { type: 'file' }>
 
-export async function loadFileNode(node: FileNode, ectx: ExecutionContext, gctx: GlobalContext): Promise<ONode> {
+export async function loadFileNode(node: FileNode, {gctx, ectx}: Pick<CompilationContext, 'ectx' | 'gctx'>): Promise<ONodeFile> {
     const file = path.parse(node.file)
 
     if (gctx.loaded_files[node.file]) {
         return gctx.loaded_files[node.file]
     }
-    let result_node: ONode
+    let result_node: ONodeFile
     if (file.ext === '.canvas') {
         const canvas_blueprint = new ExecutableCanvas(node.file, await parseCanvas(node.file, gctx));
 

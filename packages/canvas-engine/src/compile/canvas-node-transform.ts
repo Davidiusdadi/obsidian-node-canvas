@@ -9,9 +9,14 @@ import {ExecutionContext} from "./types"
 import {NodeCompiler} from "./template"
 import {JSONCanvasNode} from "./parse-canvas"
 import {ExecutableCanvas} from "../runtime/ExecutableCanvas"
+import _ from "lodash"
 
 
 type Placement = JSONCanvasNode
+
+export const node_non_unique_fields = [
+    'id', 'x', 'y', 'color', 'width', 'height'
+]
 
 const ZBaseNode = z.object({
     id: z.string(),
@@ -121,6 +126,8 @@ const ZFile = ZBaseNode.extend({
 })
 
 
+export type ONodeFile = z.output<typeof ZFile> | z.output<typeof ZText>
+
 export const NodeVariant = z.union([
     ZNodeStart,
     ZNodeUrl,
@@ -128,10 +135,16 @@ export const NodeVariant = z.union([
     ZCodeNode,
     ZGroup,
     ZFile
-])
+]).transform((v) => {
+    return v
+} )
 
 /// output node - aka instance of canvas node the final format used in the runtime
 export type ONode = z.output<typeof NodeVariant>
+
+export type RuntimeONode<T extends object = {}> = ONode & {
+    fn_original?: Fn
+} & T
 
 /** parse without finalizing .fn yet  - only do a pure zod transform */
 export const preParseNode = (input: z.input<typeof NodeVariant>, context: ExecutionContext) => {

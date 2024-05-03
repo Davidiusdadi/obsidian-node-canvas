@@ -12,10 +12,7 @@ export * from "./runtime/runtime-types"
 export {execCanvas} from "./runtime/exec-canvas"
 
 export const createCanvasEngine = async (vault_dir: string, canvas_path: string, introspection?: Introspection) => {
-    let global_context: GlobalContext = {
-        vault_dir,
-        loaded_files: {}
-    }
+    let global_context = new GlobalContext(vault_dir)
     global_context.introspection = introspection
     let node_data = await parseCanvas(canvas_path, global_context)
     return await execCanvas(new ExecutableCanvas(canvas_path, node_data), global_context)

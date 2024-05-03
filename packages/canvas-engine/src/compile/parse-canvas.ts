@@ -1,5 +1,5 @@
 import path from "node:path"
-import {ONode, preParseNode} from "./canvas-node-transform"
+import {ONode, preParseNode, RuntimeONode} from "./canvas-node-transform"
 import {readFile} from "fs/promises"
 import {GenericNode, GroupNode, JSONCanvas, LinkNode, TextNode} from '@trbn/jsoncanvas'
 import {GlobalContext, ParsedCanvas} from "../types"
@@ -11,6 +11,7 @@ import {parseMd} from "./md-parse"
 import {ExecutionContext} from "./types"
 import code_node_compilers from "../node_library"
 import {loadFileNode} from "./file-loader"
+import {Fn} from "../runtime/runtime-types"
 
 /** @trbn/jsoncanvas types are not complete - these are:  */
 export type JSONCanvasNode = (LinkNode | TextNode | GenericNode & {
@@ -42,7 +43,7 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
     const magic_words = code_node_compilers.filter(c => c.magic_word).map(c => c.lang)
     const magic_word_regex = new RegExp(`^(\\s*[_*]+(${magic_words.join('|')}):?[_*]+:?\\s*).+`, 'i')
     for (const cnode of canvas_data.getNodes() as JSONCanvasNode[]) {
-        let onode: ONode | undefined = undefined
+        let onode: RuntimeONode | undefined = undefined
 
 
         // some canvas nodes can be directly transformed
@@ -50,7 +51,10 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
         onode = preParseNode(cnode as any, context)
 
         if (onode.type === 'file') {
-            const loaded_node = await loadFileNode(onode, context, config)
+            const loaded_node = await loadFileNode(onode, {
+                ectx: context,
+                gctx: config
+            })
             if (loaded_node.type === 'text') {
                 onode = preParseNode({
                     type: 'text',
@@ -105,7 +109,17 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
         if (onode?.type === 'code') {
             for (const comp of code_node_compilers) {
                 if (comp.lang === onode.lang) {
-                    onode.fn = await comp.compile(onode.code, context, config)
+                    const my_node = onode!
+                    my_node.fn_original = await comp.compile(my_node.code, {
+                        node: onode,
+                        ectx: context,
+                        gctx: config
+                    })
+
+                    onode.fn = async function (...args) {
+                        return my_node.fn_original!.call(this, ...args)
+                    } satisfies Fn
+
                     onode.compiler = comp
                     break
                 }

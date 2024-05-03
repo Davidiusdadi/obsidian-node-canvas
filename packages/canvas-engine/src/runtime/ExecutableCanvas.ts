@@ -1,4 +1,4 @@
-import {ONode} from "../compile/canvas-node-transform"
+import {ONode, RuntimeONode} from "../compile/canvas-node-transform"
 import {FnThis} from "./runtime-types"
 import {ParsedCanvas} from "../types"
 
@@ -30,6 +30,26 @@ export class ExecutableCanvas {
             const ancestors = collect_ancestor(instr, node)
             this.node_ancestors.set(node.id, ancestors)
         })
+    }
+
+    replaceWith(new_c: ExecutableCanvas) {
+        this.nodes.forEach((node: RuntimeONode) => {
+            const new_node = new_c.node_map.get(node.id) as RuntimeONode
+            console.log('hot: update', new_node.id)
+            if(new_node) {
+                node.fn_original = new_node.fn_original
+                if (node.type === 'file' && new_node.type === 'file') {
+                    node.canvas = new_node.canvas
+                }
+            }
+
+        })
+
+        this.node_this_data = new_c.node_this_data
+        this.node_ancestors = new_c.node_ancestors
+        this.nodes = new_c.nodes
+        this.node_map = new_c.node_map
+        this.file = new_c.file
     }
 }
 

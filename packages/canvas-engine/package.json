@@ -8,10 +8,10 @@
   "private": true,
   "type": "commonjs",
   "engines": {
-    "node": "20"
+    "node": ">= 20"
   },
   "scripts": {
-    "build": "esbuild src/main.ts --bundle --loader:.ts=ts --platform=node \"--external:@babel/preset-typescript/*\" --outfile=build/main.js --sourcemap",
+    "build": "esbuild src/main.ts --bundle --loader:.ts=ts --platform=node \"--external:@babel/preset-typescript/*\" --external:node-pty --outfile=build/main.js --sourcemap",
     "dev": "this_workspace=`pwd`; yarn -s build && cd ../.. && node \"$this_workspace\"/build/main.js",
     "dev:inspect": "this_workspace=`pwd`; yarn -s build && cd ../.. && node --inspect \"$this_workspace\"/build/main.js",
     "dev:inspect-brk": "this_workspace=`pwd`; yarn -s build && cd ../.. && node --inspect-brk  \"$this_workspace\"/build/main.js",
@@ -34,13 +34,13 @@
     "nunjucks": "^3.2.4",
     "openai": "^4.29.2",
     "remark-parse": "^11.0.0",
+    "sucrase": "^3.35.0",
     "typescript": "^5.4.3",
     "unified": "^11.0.4",
     "unist-util-visit": "^5.0.0",
     "yaml": "^2.4.1",
     "yargs": "^17.7.2",
-    "zod": "^3.22.4",
-    "sucrase": "^3.35.0"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@swc/cli": "^0.3.10",
@@ -52,7 +52,6 @@
     "@types/node": "^20.11.30",
     "@types/nunjucks": "^3.2.6",
     "@types/yargs": "^17.0.32",
-
     "esbuild": "^0.20.2"
   }
 }

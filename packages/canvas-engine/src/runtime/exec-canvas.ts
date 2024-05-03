@@ -3,7 +3,7 @@ import z from "zod"
 import _ from "lodash"
 import {logger} from "../globals"
 
-import {GlobalContext} from "../types"
+import {GlobalContext, InvocationResult} from "../types"
 import chalk from "chalk"
 import {ZEdge} from "../compile/canvas-edge-transform"
 import {CTX, StackFrame} from "./runtime-types"
@@ -18,17 +18,12 @@ import {zRFrameComplete, zRFrameNew} from "./inspection/protocol"
 export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalContext) {
 
 
-    let stack: StackFrame[] = []
+    const stack = gctx.stack
     let frame_id = 0
 
 
-    type InvocationResult = z.input<typeof zRFrameComplete> | { type: 'frame-pushback', frame: StackFrame }
-
     let active_frame_modified = promiseWithResolver<'modified'>()
-    let active_frames: {
-        promise: Promise<InvocationResult>,
-        frame: StackFrame
-    }[] = []
+    const active_frames = gctx.active_frames
 
 
     const push_frame = (frame: StackFrame) => {
@@ -149,8 +144,7 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
     }
 
     const invoke_frame = async (frame: StackFrame): Promise<InvocationResult> => {
-        const {node, input, state, edge} = frame
-        const {fn, ...node_debug} = node
+        const {input, state} = frame
 
         await gctx.introspection?.inform({
             type: 'frame-upsert',
@@ -162,12 +156,12 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
             frame_id: frame.id!,
         })
 
-        const edges_default_out = node.edges.filter((edge) => {
+        const edges_default_out = frame.node.edges.filter((edge) => {
             if (edge.direction !== 'forward') {
                 return false
             }
 
-            if (edge.from === node.id && (edge.label?.trim() || '').length === 0) {
+            if (edge.from === frame.node.id && (edge.label?.trim() || '').length === 0) {
                 return true
             }
 
@@ -184,22 +178,24 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
         })
 
 
-        const this_data = frame.chart.node_this_data.get(node.id)!
+        const this_data = frame.chart.node_this_data.get(frame.node.id)!
         const ctx: CTX = {
             input: input,
             state: state,
             vault_dir: gctx.vault_dir,
             _this: this_data,
             self_canvas_nodes: frame.chart,  // will be set during node execution
-            self_canvas_node: node, // will be set during node execution
+            get self_canvas_node() {
+                return frame.node
+            }, // will be set during node execution
             updateInput: (input) => ctx.input = input,
             updateState: (state) => ctx.state = state,
             injectFrame: (frame: StackFrame) => push_frame(frame),
             emit: (label: string | undefined, emission: any) => {
                 logger.trace(`<frame ${frame.id} emitting: [${label ?? '-'}] >`)
                 logger.debug('emitting: ', label, emission)
-                const edges_label_out = node.edges.filter((edge) => {
-                    return edge.direction === 'forward' && edge.from === node.id && edge.label?.trim() === label
+                const edges_label_out = frame.node.edges.filter((edge) => {
+                    return edge.direction === 'forward' && edge.from === frame.node.id && edge.label?.trim() === label
                 })
                 emit_along_edges(frame!, edges_label_out, emission)
             },
@@ -212,12 +208,12 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
         ctx.join = InputsFilterJoiner.create(ctx, frame)
 
 
-        frame.chart.node_this_data.set(node.id, this_data)
+        frame.chart.node_this_data.set(frame.node.id, this_data)
 
-        logger.debug('exec frame:', `${frame.id}   --[${frame.edge?.label ?? '-'}]-->(${node.type}: lang: ${(node as any)?.lang}) :: ${chalk.gray((node as any)?.code ?? '<no-code>')}`)
+        logger.debug('exec frame:', `${frame.id}   --[${frame.edge?.label ?? '-'}]-->(${frame.node.type}: lang: ${(frame.node as any)?.lang}) :: ${chalk.gray((frame.node as any)?.code ?? '<no-code>')}`)
 
         try {
-            const return_value = await node.fn.call(this_data, ctx)
+            const return_value = await frame.node.fn.call(this_data, ctx)
             const return_emissions = emit_along_edges(frame, edges_default_out, return_value)
             return {
                 type: 'frame-complete',
@@ -252,10 +248,10 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
                     } satisfies z.input<typeof zRFrameComplete>
                 }
                 return {type: 'frame-pushback', frame} // not an error
-            } else if (node.type === 'code') {
-                logger.error(`error running code-node [${chalk.greenBright(node.lang)}]: \n': ${chalk.blue(node.code)}`)
+            } else if (frame.node.type === 'code') {
+                logger.error(`error running code-node [${chalk.greenBright(frame.node.lang)}]: \n': ${chalk.blue(frame.node.code)}`)
             } else {
-                logger.error('error in node:', JSON.stringify(node, null, 2))
+                logger.error('error in node:', JSON.stringify(frame.node, null, 2))
             }
             console.error('(trace): input', frame.input)
             console.error('(trace): state', frame.state)
@@ -306,7 +302,11 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
                 logger.trace(`<frame ${frame?.id} invoking>`)
 
                 const activity = invoke_frame(frame).then(ac => {
-                    active_frames = active_frames.filter(({frame: f}) => f !== frame)
+                    // avoiding a reassigning active_frames
+                    let splice_index = active_frames.findIndex(({frame: f}) => f === frame)
+                    if (splice_index !== -1) {
+                        active_frames.splice(splice_index, 1)
+                    }
 
                     if (ac.type === 'frame-pushback') {
                         logger.trace(`<frame ${ac.frame.id} pushback [${ac.frame.is_aggregating ? 'aggs' : 'zip'}]' >`)

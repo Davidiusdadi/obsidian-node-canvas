@@ -1,6 +1,8 @@
 import {NodeCompiler} from "../../compile/template"
 import * as readline from 'readline';
 import {template_render} from "../lang/yaml"
+import {RuntimeONode} from "../../compile/canvas-node-transform"
+import {CTX} from "../../runtime/runtime-types"
 
 // Function to read a line from stdin
 const readLineAsync = (query: string): Promise<string> => {
@@ -17,14 +19,23 @@ const readLineAsync = (query: string): Promise<string> => {
     });
 };
 
+let one_at_a_time = Promise.resolve<string>('')
+
+type Extras = { template: string }
+
 export default {
     magic_word: true,
     lang: 'question',
-    compile: async (code) => {
-        return async (ctx) => {
-            const render = template_render(code, ctx)
-            process.stdout.write(render)
-            return await readLineAsync(render)
+    compile: async (code, {node: onode}) => {
+        const node = onode as RuntimeONode<Extras>
+        node.template = code
+        return async (ctx: CTX<Extras>) => {
+            one_at_a_time = one_at_a_time.then(() => {
+                const render = template_render(ctx.self_canvas_node.template, ctx)
+                process.stdout.write(render)
+                return readLineAsync(render)
+            })
+            return one_at_a_time
         }
     }
 } satisfies NodeCompiler
