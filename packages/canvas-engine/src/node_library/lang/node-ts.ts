@@ -15,7 +15,7 @@ function transformStaticImportsToDynamic(code: string) {
             if (imports.match(/\{.*\}/) === null) {
                 unpack = `${imports} = ${imports}.default || ${imports};`
             }
-            return `let ${imports} = await import('${source}'); ${unpack};`;
+            return `let ${imports} = await import_override('${source}'); ${unpack};`;
         });
 }
 

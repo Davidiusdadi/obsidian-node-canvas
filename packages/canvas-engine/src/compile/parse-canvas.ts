@@ -9,7 +9,7 @@ import {logger} from "../globals"
 import {ZEdge} from "./canvas-edge-transform"
 import {parseMd} from "./md-parse"
 import {ExecutionContext} from "./types"
-import code_node_compilers from "../node_library"
+import {default as core_node_lib} from "../node_library"
 import {loadFileNode} from "./file-loader"
 import {Fn} from "../runtime/runtime-types"
 
@@ -39,6 +39,8 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
     }
 
     const onode_data = new Map<string, ONode>()
+
+    const code_node_compilers = [ ...core_node_lib, ...(config.node_types_additions ?? [])]
 
     const magic_words = code_node_compilers.filter(c => c.magic_word).map(c => c.lang)
     const magic_word_regex = new RegExp(`^(\\s*[_*]+(${magic_words.join('|')}):?[_*]+:?\\s*).+`, 'i')

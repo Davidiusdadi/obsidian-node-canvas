@@ -138,6 +138,8 @@ export const NodeVariant = z.union([
 ]).transform((v) => {
     return v
 } )
+])
+
 
 /// output node - aka instance of canvas node the final format used in the runtime
 export type ONode = z.output<typeof NodeVariant>

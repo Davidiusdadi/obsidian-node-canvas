@@ -5,6 +5,9 @@ import {GlobalContext} from "../types"
 export function js_to_fn(code: string, context: GlobalContext): Fn {
     const instr_code = `
 
+
+let import_override = ctx.gctx.import_override 
+
 let state = ctx.state;    
     
 return (async () => {
