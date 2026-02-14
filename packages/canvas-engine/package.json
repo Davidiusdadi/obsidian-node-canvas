@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@langchain/community": "^1.1.15",
+    "@langchain/core": "^1.1.24",
     "@langchain/ollama": "^1.2.2",
     "@langchain/openai": "^1.2.7",
     "axios": "^1.13.5",
