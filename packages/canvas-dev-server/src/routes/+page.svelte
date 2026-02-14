@@ -157,7 +157,7 @@
                             <div class="p-4">
                                 <ul>
                                     {#each $chart_list as file}
-                                        <li on:click={() => chart_path.set(file) }
+                                        <li onclick={() => chart_path.set(file) }
                                         class:font-bold={file === $chart_path}
                                         >{file}</li>
                                     {/each}
