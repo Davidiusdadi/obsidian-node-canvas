@@ -1,0 +1,25 @@
+{
+  "name": "example-call-canvas",
+  "module": "index.ts",
+  "type": "module",
+  "dependencies": {
+    "@directus/sdk": "^15.0.3",
+
+    "@mozilla/readability": "^0.5.0",
+    "tsne-js": "^1.0.3",
+    "youtube-transcript": "^1.1.0",
+    "youtubei.js": "^9.1.0",
+
+    "photon-geocoder": "^1.0.1",
+    "langchain": "^0.1.28",
+    "playwright": "^1.42.1",
+    "puppeteer": "^22.6.1",
+    "obsidian-vault-parser": "git+https://github.com/Davidiusdadi/obsidian-vault-parser.git#main"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

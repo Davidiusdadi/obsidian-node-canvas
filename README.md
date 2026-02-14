@@ -13,13 +13,13 @@ Example 2:
 
 > To be sure to only see what was created **during the hackaton** see [branch: during-hackathon](https://github.com/Davidiusdadi/obsidian-node-canvas/tree/during-hackathon). Right now  [master](https://github.com/Davidiusdadi/obsidian-node-canvas/tree/master)-branch and [during-hackathon](https://github.com/Davidiusdadi/obsidian-node-canvas/tree/during-hackathon)-branch should be almost identical.
 
-**Obsidan-Node-Canvas** is a `javascript`-based workflow/scripting engine build on top of [obsidian](https://obsidian.md/)  (the popular and powerful journaling, knowledge bases, and project management tool ) - and specifically https://obsidian.md/canvas.
+**Obsidian-Node-Canvas** is a `javascript`-based workflow/scripting engine build on top of [obsidian](https://obsidian.md/)  (the popular and powerful journaling, knowledge bases, and project management tool ) - and specifically https://obsidian.md/canvas.
 
-Using Obsidan-Node-Canvas requires at least basic understanding `javascript`-programming. 
+Using Obsidian-Node-Canvas requires at least basic understanding of `javascript` programming. 
 
 You could use it to automate things in your obsidian-vault - but the main obsidian connection is that obsidian acts as a frontend - what you build is up to you. 
 
-**Obsidan-Node-Canvas** makes it possible to:
+**Obsidian-Node-Canvas** makes it possible to:
 
 - ✅ visually _compose_ "function"-blocks (nodes on a canvas) and **execute** them
 - intuitively combine:
@@ -41,7 +41,7 @@ You could use it to automate things in your obsidian-vault - but the main obsidi
 
 ## Conception
 
-**Obsidan-Node-Canvas** has been _**conceived**_ 💥 and _**prototyped**_ 🚀 during the **[Code 2 Community - The Y Berlin x ICP](https://lu.ma/zwblit5f) hackathon**.
+**Obsidian-Node-Canvas** has been _**conceived**_ 💥 and _**prototyped**_ 🚀 during the **[Code 2 Community - The Y Berlin x ICP](https://lu.ma/zwblit5f) hackathon**.
 
 This project has been submitted [here](https://dacade.org/communities/icp/challenges/b35bd8af-51d3-437a-af13-4e649529c7e5/submissions/5605d208-bb84-4551-9697-e89f75901ce0).
 
@@ -56,14 +56,14 @@ Here a rough overview:
 
 - only one node is active at a time
 - the first code block of each node will be executed
-- execution starts at a with just the content: 'start'
+- execution starts at a node with just the content: 'start'
 - there are nodes that do not use code-blocks but special syntax (see below)
 - only directed arrows matter as of now
 - currently all invocations are stored until the canvas complete
   - aka. circular constructs will leak memory 
     - this will be fixed when aggregations get an update
 - these are the special variables
-  - `input` - can be anyting
+  - `input` - can be anything
   - `state` - can be anything - is cloned whenever it passed through an arrow
   - `this` - is persistant during a node's invocations
     - holds special `join` object used for flow control (see below)
@@ -90,8 +90,8 @@ Here a rough overview:
     - supports nunjucks templating
   - "prompt gpt" (specific format required)
     - supports nunjucks templating
-- magic fist word node:
-  - `decide` promptes gpt-3 (will be reworked soon)
+- magic first word node:
+  - `decide` prompts gpt-3 (will be reworked soon)
 - _identity_ - anything that cant be parsed yet is not specifically wrong (e.g. bad js syntax) will be treated as and identity function `(input) => input`
   - an empty node will also be and identity node
 
@@ -137,35 +137,64 @@ Analogous there is also `const list = zipOnState('name').list()` and `const list
 
 ##### zip merge example 1:
 
-![img.png](examples/tutorial/flow-control/images/example-zip-simple-success.png)
+![img.png](examples/feature-tour/2-flow-control/images/example-zip-simple-success.png)
 
 ##### zip merge example 2:
 
-![img_1.png](examples/tutorial/flow-control/images/example-zip-partial-success.png)
+![img_1.png](examples/feature-tour/2-flow-control/images/example-zip-partial-success.png)
 
 ## how to run
 
 > Warning: install run at your own risk. Do not execute `.canvas` that you do not understand.
 
-- clone this repo
-- be sure you have a recent `node` version installed. I used v20.10.0
-- install via [yarn](https://yarnpkg.com/) 
+### Initial Setup
 
-- create a `.env` file
-  - containing `OPENAI_API_KEY=<YOURKEYHERE>`
-  - this is needed as the tutorial.canvas uses LLM-nodes
+1. **Clone this repo**
+2. **Install Node.js** - Recent version required (tested with v20.10.0, works with v22+)
+3. **Install dependencies** via [yarn](https://yarnpkg.com/):
 
-- then:
 ```bash
-# from the checkout root call:
+yarn install
+```
 
-yarn install # install dependencies
+> **Note:** You may see a build warning about the `canvas` package (missing `pangocairo` system dependencies). This is harmless and won't affect basic functionality.
 
-yarn dev --vault examples --canvas tutorial/tutorial.canvas
-yarn dev --vault examples --canvas tutorial/read-eval-loop/sly-llm-agent.canvas
-yarn dev --vault examples --canvas tutorial/flow-control/zip-and-aggregate.canvas
-yarn dev --vault examples --canvas tutorial/reference-file/hello.canvas
+4. **(Optional)** Create a `.env` file for LLM features:
+   - Only needed if you want to use LLM/GPT nodes
+   - Add: `OPENAI_API_KEY=<YOURKEYHERE>`
+   - Not required for basic canvas execution
 
+### Running Examples
+
+All examples should be run from the repository root:
+
+#### Core Features (No API Key Required) ✅
+
+```bash
+# Basic arrow propagation and data flow
+yarn dev --vault examples --canvas feature-tour/1-arrow-propagation/propagation.canvas
+
+# Flow control: aggregation
+yarn dev --vault examples --canvas feature-tour/2-flow-control/aggregate.canvas
+
+# Flow control: zip and aggregate
+yarn dev --vault examples --canvas feature-tour/2-flow-control/zip-and-aggregate.canvas
+
+# Canvas composition and signals
+yarn dev --vault examples --canvas feature-tour/3-canvas-signals/caller.canvas
+
+# Canvas overload patterns
+yarn dev --vault examples --canvas feature-tour/4-canvas-overload/caller.canvas
+```
+
+#### Advanced Examples (Require OpenAI API Key) 🔑
+
+```bash
+# LLM-powered tutorial
+yarn dev --vault examples --canvas feature-tour/tutorial.canvas
+
+# Shell automation with LLM
+yarn dev --vault examples --canvas feature-tour/shell/bash.canvas
 ```
 
 Off you go with your own canvas 🕊️

@@ -1,0 +1,13 @@
+{
+	"nodes":[
+		{"id":"8e79f5bbfedb7392","type":"file","file":"feature-tour/4-canvas-overload/clock.canvas","x":-380,"y":-160,"width":400,"height":400},
+		{"id":"7b6e9276abb8733c","type":"text","text":"start","x":-380,"y":-340,"width":116,"height":60},
+		{"id":"33830d534879be52","type":"text","text":"**log**  overload {{input}} & {{ state.id}}.{{ state.iter}}","x":200,"y":-10,"width":420,"height":100},
+		{"id":"25efc78f9b3de1e1","type":"text","text":"**return**\n","x":220,"y":178,"width":380,"height":62}
+	],
+	"edges":[
+		{"id":"ffd26bb196941b17","fromNode":"7b6e9276abb8733c","fromSide":"right","toNode":"8e79f5bbfedb7392","toSide":"top","label":"kick-off"},
+		{"id":"897fd8028b33e0f2","fromNode":"33830d534879be52","fromSide":"left","toNode":"8e79f5bbfedb7392","toSide":"right","toEnd":"none","color":"5","label":"action"},
+		{"id":"80c8c2548241dac7","fromNode":"33830d534879be52","fromSide":"bottom","toNode":"25efc78f9b3de1e1","toSide":"top"}
+	]
+}
