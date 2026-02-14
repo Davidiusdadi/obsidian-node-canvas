@@ -101,12 +101,19 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
             .find((frame) => {
                 const ancestors = frame.chart.node_ancestors.get(frame.node.id)!
                 const not_on_stack = stack.every((frame) => !ancestors.has(frame.node.id))
+                const no_active_ancestors = active_frames
+                    .every((f) => {
+                        return f.frame === frame || !ancestors.has(f.frame.node.id)
+                    })
 
-                return not_on_stack
-                    && active_frames
-                        .every((f) => {
-                            return f.frame === frame || !ancestors.has(f.frame.node.id)
-                        })
+                // Also check that no other frames for the SAME node are still executing
+                // The aggregate should only complete when ALL frames for this node have finished their initial execution
+                const no_sibling_frames = active_frames
+                    .every((f) => {
+                        return f.frame === frame || f.frame.node !== frame.node
+                    })
+
+                return not_on_stack && no_active_ancestors && no_sibling_frames
             })
 
 
