@@ -19,7 +19,6 @@
     import {get} from "svelte/store"
     import type {ONode} from "canvas-engine/src/compile/canvas-node-transform"
     import NodeContent from "$lib/client/NodeContent.svelte"
-    import {Tab, TabGroup} from "@skeletonlabs/skeleton"
     import {color} from "$lib/color"
     import Color from "color"
     import Icon from "@iconify/svelte"
@@ -106,12 +105,14 @@
                     </div>
                 </div>
 
-                <TabGroup>
-                    <Tab bind:group={tabSet} name="tab2" value={1}>Definition</Tab>
-                    <Tab bind:group={tabSet} name="tab3" value={2}>Logs</Tab>
-                    <Tab bind:group={tabSet} name="tab3" value={3}>Input</Tab>
-                    <Tab bind:group={tabSet} name="tab3" value={4}>Files</Tab>
-                    <svelte:fragment slot="panel">
+                <div class="flex flex-col">
+                    <div class="flex border-b">
+                        <button class="px-4 py-2" class:font-bold={tabSet === 1} class:border-b-2={tabSet === 1} class:border-blue-500={tabSet === 1} on:click={() => tabSet = 1}>Definition</button>
+                        <button class="px-4 py-2" class:font-bold={tabSet === 2} class:border-b-2={tabSet === 2} class:border-blue-500={tabSet === 2} on:click={() => tabSet = 2}>Logs</button>
+                        <button class="px-4 py-2" class:font-bold={tabSet === 3} class:border-b-2={tabSet === 3} class:border-blue-500={tabSet === 3} on:click={() => tabSet = 3}>Input</button>
+                        <button class="px-4 py-2" class:font-bold={tabSet === 4} class:border-b-2={tabSet === 4} class:border-blue-500={tabSet === 4} on:click={() => tabSet = 4}>Files</button>
+                    </div>
+                    <div class="p-4">
                         {#if tabSet === 1}
                             {#if selectedNode}
                                 {@const data = selectedNode.data}
@@ -152,8 +153,8 @@
                                 {/each}
                             </ul>
                         {/if}
-                    </svelte:fragment>
-                </TabGroup>
+                    </div>
+                </div>
             </div>
         </Pane>
 

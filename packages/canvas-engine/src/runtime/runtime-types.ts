@@ -39,7 +39,7 @@ export const zStackFrame = z.object({
     input: z.any(),
     state: z.any(),
     internal_state: z.object({
-        inject_return: z.array(z.function().args(z.any()).returns(z.any()))
+        inject_return: z.array(z.function())
     }).passthrough(),
     edge: z.nullable(zz<OEdge>()),
     is_aggregating: z.boolean(),
