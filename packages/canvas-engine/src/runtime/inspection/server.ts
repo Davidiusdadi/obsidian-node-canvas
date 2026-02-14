@@ -22,7 +22,7 @@ export const startDevServer = () => {
 
     let canvases: ExecutableCanvas[] = []
 
-    wss.on('connection', function connection(ws) {
+    wss.on('connection', function connection(ws: WebSocket) {
         logger.info('inspector connected');
 
         clients.add(ws)
@@ -41,7 +41,7 @@ export const startDevServer = () => {
         send(runner_state)
 
 
-        ws.on('message', function message(data) {
+        ws.on('message', function message(data: any) {
             const json = Flatted.parse(data.toString())
             const msg = inspector2runner.parse(json)
 
