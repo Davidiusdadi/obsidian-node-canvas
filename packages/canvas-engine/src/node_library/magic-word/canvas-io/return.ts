@@ -18,7 +18,7 @@ export default {
             if (!inject_return) {
                 throw new Error(`return called without a previous inject`)
             }
-            inject_return(ctx)
+            (inject_return as any)(ctx)
             throw new NodeReturnNotIntendedByDesign()
         }
         node.inject_name = code.trim().toLowerCase()

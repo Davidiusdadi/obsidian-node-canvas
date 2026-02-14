@@ -2,7 +2,7 @@ import {NodeCompiler} from "../../../compile/template"
 import {logger} from "../../../globals"
 import {template_render} from "../../lang/yaml"
 import chalk from "chalk"
-import {ChatOllama} from "@langchain/community/chat_models/ollama";
+import {ChatOllama} from "@langchain/ollama";
 import {StringOutputParser} from "@langchain/core/output_parsers";
 import {HumanMessage} from "@langchain/core/messages";
 import {zRLLMChunk, zRUpdate} from "../../../runtime/inspection/protocol"
