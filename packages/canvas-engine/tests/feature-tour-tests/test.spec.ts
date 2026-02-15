@@ -74,7 +74,6 @@ test('2-flow-control/aggregate-loop.canvas', async () => {
 });
 
 
-
 test('2-flow-control/zip-and-aggregate.canvas', async () => {
     const file = "feature-tour/2-flow-control/zip-and-aggregate.canvas"
     const res = await createCanvasEngine(vault, file);
@@ -83,8 +82,6 @@ test('2-flow-control/zip-and-aggregate.canvas', async () => {
     expect(left.id).toBe('a')
     expect(Object.keys(left)).toHaveLength(4)
 });
-
-
 
 
 test('3-canvas-signals/caller.canvas', async () => {
@@ -109,4 +106,25 @@ test('3-canvas-signals/caller.canvas', async () => {
         }
     });
     expect(res.return_value).toBe(4)
+});
+
+
+test('4-canvas-overload/caller.canvas', async () => {
+    const file = "feature-tour/4-canvas-overload/caller.canvas"
+
+    let foundOverload10 = false
+
+    const res = await createCanvasEngine(vault, file, {
+        inform: (msg) => {
+            if (msg.type === 'log') {
+                if (msg.content.includes('overload 10 & 1.10')) {
+                    foundOverload10 = true
+                }
+            }
+        }
+    });
+
+
+    // Verify we saw the 10th iteration log message
+    expect(foundOverload10).toBe(true)
 });
