@@ -18,7 +18,7 @@ export function createNode(
       edges,
       fn: baseFn,
       original: {} as any,
-    } as ONode;
+    } as unknown as ONode;
   }
 
   if (type === "code") {
@@ -31,18 +31,19 @@ export function createNode(
       fn: baseFn,
       original: {} as any,
       compiler: undefined,
-    } as ONode;
+    } as unknown as ONode;
   }
 
   // text/identity node
   return {
     id,
     type: "text",
-    text: "",
+    code: "",
     edges,
+    comment: undefined,
     fn: baseFn,
     original: {} as any,
-  } as ONode;
+  } as unknown as ONode;
 }
 
 export function createSimplePassthroughNode(

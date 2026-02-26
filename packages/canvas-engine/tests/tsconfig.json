@@ -2,7 +2,7 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "module": "ESNext",
-    "types": ["bun:types", "bun-types"]
+    "types": ["bun-types"]
   },
     "include": ["**/*.ts"],
 }

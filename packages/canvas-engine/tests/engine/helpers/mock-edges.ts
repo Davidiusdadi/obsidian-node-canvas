@@ -11,13 +11,12 @@ export function createEdge(
 ): z.output<typeof ZEdge> {
     return {
         id: `edge_${++edgeIdCounter}`,
+        type: 'arrow',
         from,
         to,
-        fromSide: 'right',
-        toSide: 'left',
         label: label ?? '',
         direction,
-        original: {} as any
+        orginal: {} as any
     }
 }
 

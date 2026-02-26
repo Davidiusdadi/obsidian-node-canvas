@@ -35,7 +35,7 @@ const args = yargs(hideBin(process.argv))
         type: 'boolean',
         default: true
     })
-    .option('--server', {
+    .option('server', {
         type: 'boolean',
         description: 'start a dev server for the canvas',
         default: false
