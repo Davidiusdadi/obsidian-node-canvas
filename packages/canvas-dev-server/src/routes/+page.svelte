@@ -5,15 +5,20 @@
     import yaml from 'js-yaml';
 
     import {
-        chart_list,
         chart_path,
         edges,
+        engine_canvas_path,
         last_message,
+        loadVaultFiles,
+        loadViewerCanvas,
         messages,
         nodes,
         sendToRunner,
         stack,
-        this_step_frame
+        this_step_frame,
+        viewer_files,
+        viewer_vault,
+        ws_connected,
     } from '$lib/store';
     import FNode from "$lib/client/FNode.svelte"
     import {get} from "svelte/store"
@@ -44,19 +49,19 @@
     } satisfies FitViewOptions
 
 
-    let tabSet: number = 1;
+    let tabSet: number = 0;
     let selectedNode: Node<ONode> | null = null
     const nodeclick = (e: CustomEvent<{ event: MouseEvent | TouchEvent; node: Node<ONode> }>) => {
         selectedNode = e.detail.node
+        tabSet = 1
         console.log(selectedNode)
     }
 
+    let vaultInput: string = $viewer_vault
 
-    function debug_action_play() {
-        sendToRunner({
-            type: 'debug-action',
-            action: 'fast-forward'
-        })
+    function onVaultSubmit() {
+        viewer_vault.set(vaultInput)
+        loadVaultFiles(vaultInput || undefined)
     }
 
 </script>
@@ -82,11 +87,9 @@
         <Pane>
             <div class="w-[500px] origin-top-left">
 
+                {#if $ws_connected}
                 <div class="absolute left-1.5 top-1.5">
                     <div class="btn-group variant-filled">
-                        <!--
-                                   <button> <Icon icon="material-symbols:fast-forward-rounded" /></button>
-                                   <button> <Icon icon="material-symbols:pause" /></button>-->
                         <button
                             on:click={() =>  sendToRunner({
                         type: 'debug-action',
@@ -105,14 +108,39 @@
                         </button>
                     </div>
                 </div>
+                {/if}
 
                 <TabGroup>
-                    <Tab bind:group={tabSet} name="tab2" value={1}>Definition</Tab>
-                    <Tab bind:group={tabSet} name="tab3" value={2}>Logs</Tab>
-                    <Tab bind:group={tabSet} name="tab3" value={3}>Input</Tab>
-                    <Tab bind:group={tabSet} name="tab3" value={4}>Files</Tab>
+                    <Tab bind:group={tabSet} name="tab-files" value={0}>Files</Tab>
+                    <Tab bind:group={tabSet} name="tab-def" value={1}>Definition</Tab>
+                    <Tab bind:group={tabSet} name="tab-logs" value={2}>Logs</Tab>
+                    <Tab bind:group={tabSet} name="tab-input" value={3}>Input</Tab>
                     <svelte:fragment slot="panel">
-                        {#if tabSet === 1}
+                        {#if tabSet === 0}
+                            <div class="p-2 flex flex-col gap-2">
+                                <form on:submit|preventDefault={onVaultSubmit} class="flex gap-1">
+                                    <input
+                                        class="input variant-form-material flex-1 text-sm"
+                                        type="text"
+                                        placeholder="Vault path"
+                                        bind:value={vaultInput}
+                                    />
+                                    <button type="submit" class="btn btn-sm variant-filled">Load</button>
+                                </form>
+                                <ul class="overflow-y-auto max-h-[80vh]">
+                                    {#each $viewer_files as file}
+                                        <li
+                                            class="cursor-pointer hover:bg-surface-200 px-2 py-1 rounded text-sm"
+                                            class:font-bold={file === $chart_path}
+                                            on:click={() => loadViewerCanvas(file)}
+                                        >{$ws_connected && file === $engine_canvas_path ? '🔌' : file === $chart_path ? '▶' : ''}{file}</li>
+                                    {/each}
+                                    {#if $viewer_files.length === 0}
+                                        <li class="text-sm opacity-50 px-2 py-1">No .canvas files found</li>
+                                    {/if}
+                                </ul>
+                            </div>
+                        {:else if tabSet === 1}
                             {#if selectedNode}
                                 {@const data = selectedNode.data}
                                 <div
@@ -142,15 +170,6 @@
                             <h3>State</h3>
                             {@html mdToHtml(`\`\`\`yaml\n${yaml.dump($this_step_frame?.state, {indent: 2})}\n\`\`\``)}
 
-
-                        {:else if tabSet === 4}
-                            <ul>
-                                {#each $chart_list as file}
-                                    <li on:click={() => chart_path.set(file) }
-                                    class:font-bold={file === $chart_path}
-                                    >{file}</li>
-                                {/each}
-                            </ul>
                         {/if}
                     </svelte:fragment>
                 </TabGroup>

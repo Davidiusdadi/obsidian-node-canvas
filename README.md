@@ -143,6 +143,34 @@ Analogous there is also `const list = zipOnState('name').list()` and `const list
 
 ![img_1.png](examples/feature-tour/2-flow-control/images/example-zip-partial-success.png)
 
+## Canvas Dev Server
+
+The **Canvas Dev Server** is a browser-based viewer for `.canvas` files in your vault.
+
+### Start the viewer
+
+```bash
+cd packages/canvas-dev-server
+VAULT_PATH=/your/obsidian/vault yarn dev
+```
+
+Then open http://localhost:5173/. The **Files** tab lists every `.canvas` file found in the vault. Click any file to render its node graph — no engine required.
+
+### Engine debug mode
+
+For live execution inspection, run the canvas engine with `--server`:
+
+```bash
+yarn dev --vault examples --canvas feature-tour/1-arrow-propagation/propagation.canvas --server
+```
+
+The dev server connects automatically via WebSocket. When connected:
+- `🔌` appears next to the canvas the engine is currently running
+- `▶` appears next to the canvas you have open in the viewer (when it differs from the engine canvas)
+- **Play** and **Step** buttons appear for stepping through execution frame by frame
+
+---
+
 ## how to run
 
 > Warning: install run at your own risk. Do not execute `.canvas` that you do not understand.
