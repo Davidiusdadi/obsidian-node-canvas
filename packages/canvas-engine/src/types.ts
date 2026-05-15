@@ -2,6 +2,7 @@ import {ONode, ONodeFile} from "./compile/canvas-node-transform"
 import {Introspection, StackFrame} from "./runtime/runtime-types"
 import z from "zod"
 import {zRFrameComplete} from "./runtime/inspection/protocol"
+import {NodeCompiler} from "./compile/template"
 
 /** Parsed / Compiled canvas - ready for execution */
 export type ParsedCanvas = Map<string, ONode>
@@ -11,6 +12,7 @@ export type InvocationResult = z.input<typeof zRFrameComplete> | { type: 'frame-
 export class GlobalContext {
 
     introspection?: Introspection
+    nodeCompilers: NodeCompiler[] = []
     loaded_files: {
         [file_path: string]: ONodeFile
     } = {}

@@ -9,6 +9,7 @@ import {existsSync} from "node:fs"
 import {ExecutableCanvas} from "./runtime/ExecutableCanvas"
 import {startDevServer} from "./runtime/inspection/server"
 import {GlobalContext} from "./types"
+import defaultCompilers from "./node_library"
 import {DMsgCanvas} from "./runtime/inspection/protocol"
 import _ from "lodash"
 import {FileNode, loadFileNode} from "./compile/file-loader"
@@ -85,7 +86,7 @@ async function parseAndRun() {
     try {
 
         let global_context = new GlobalContext(vault_dir)
-
+        global_context.nodeCompilers = defaultCompilers
 
         stage = 'runtime'
 
@@ -148,6 +149,7 @@ async function parseAndRun() {
                     console.log(`hot reload: ${evnt}: ${path}`)
                     const node = global_context.loaded_files[path]
                     let temp_gctx = new GlobalContext(vault_dir)
+                    temp_gctx.nodeCompilers = global_context.nodeCompilers
                     temp_gctx.introspection = global_context.introspection
                     let new_node = await loadFileNode(root_file(), {
                         gctx: temp_gctx,

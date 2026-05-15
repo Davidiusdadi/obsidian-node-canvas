@@ -9,7 +9,6 @@ import {logger} from "../globals"
 import {ZEdge} from "./canvas-edge-transform"
 import {parseMd} from "./md-parse"
 import {ExecutionContext} from "./types"
-import code_node_compilers from "../node_library"
 import {loadFileNode} from "./file-loader"
 import {Fn} from "../runtime/runtime-types"
 
@@ -40,7 +39,7 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
 
     const onode_data = new Map<string, ONode>()
 
-    const magic_words = code_node_compilers.filter(c => c.magic_word).map(c => c.lang)
+    const magic_words = config.nodeCompilers.filter(c => c.magic_word).map(c => c.lang)
     const magic_word_regex = new RegExp(`^(\\s*[_*]+(${magic_words.join('|')}):?[_*]+:?\\s*).+`, 'i')
     for (const cnode of canvas_data.getNodes() as JSONCanvasNode[]) {
         let onode: RuntimeONode | undefined = undefined
@@ -76,7 +75,7 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
                 const magic_word = magic_word_check[2].toLowerCase()
                 const text = onode.code.substring(magic_word_check[1].length)
 
-                for (const comp of code_node_compilers) {
+                for (const comp of config.nodeCompilers) {
                     if (comp.magic_word && comp.lang === magic_word) {
                         onode = preParseNode({
                             type: 'code',
@@ -107,7 +106,7 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
 
 
         if (onode?.type === 'code') {
-            for (const comp of code_node_compilers) {
+            for (const comp of config.nodeCompilers) {
                 if (comp.lang === onode.lang) {
                     const my_node = onode!
                     my_node.fn_original = await comp.compile(my_node.code, {
