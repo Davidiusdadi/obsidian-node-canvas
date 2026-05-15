@@ -4,6 +4,12 @@
   "main": "dist/lib.js",
   "module": "dist/lib.js",
   "types": "dist/lib.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/lib.d.ts",
+      "default": "./dist/lib.js"
+    }
+  },
   "license": "private",
   "private": true,
   "type": "commonjs",

@@ -2,7 +2,7 @@
     // eslint-disable svelte/valid-compile
 
     import {Handle, type Node, type NodeProps, Position} from '@xyflow/svelte';
-    import type {ONode} from "canvas-engine/src/compile/canvas-node-transform"
+    import type {ONode} from "canvas-engine"
     import {color} from "$lib/color"
     import Color from "color"
     import NodeContent from "$lib/client/NodeContent.svelte"

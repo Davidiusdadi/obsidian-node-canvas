@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type {ONode} from "canvas-engine/src/compile/canvas-node-transform"
+    import type {ONode} from "canvas-engine"
     import {mdToHtml} from "$lib/md-to-html"
 
     export let node: ONode

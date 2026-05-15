@@ -5,14 +5,9 @@ import {ExecutableCanvas} from "./runtime/ExecutableCanvas"
 import {Introspection} from "./runtime/runtime-types"
 import {NodeCompiler} from "./compile/template"
 import _defaultCompilers from './node_library'
-export type {ONode} from "./compile/canvas-node-transform"
-export * from "./runtime/errors"
-export type * from "./types"
-export type {NodeCompiler} from "./compile/template"
-export {ExecutableCanvas} from "./runtime/ExecutableCanvas"
-export * from "./runtime/runtime-types"
-export {execCanvas} from "./runtime/exec-canvas"
 
+// ── Engine entry ──────────────────────────────────────────────────────────────
+export {execCanvas} from "./runtime/exec-canvas"
 export const defaultCompilers: NodeCompiler[] = _defaultCompilers
 
 export type EngineOptions = {
@@ -48,4 +43,31 @@ export const createCanvasEngine = async (
     return await execCanvas(new ExecutableCanvas(canvas_path, node_data), global_context)
 }
 
-export default createCanvasEngine;
+export default createCanvasEngine
+
+// ── Global state ──────────────────────────────────────────────────────────────
+export {GlobalContext} from "./types"
+export type {ParsedCanvas, InvocationResult} from "./types"
+
+// ── Authoring NodeCompilers ───────────────────────────────────────────────────
+export type {NodeCompiler, CompilationContext} from "./compile/template"
+export type {ExecutionContext} from "./compile/types"
+
+// ── Canvas model ──────────────────────────────────────────────────────────────
+export type {ONode, ONodeFile, RuntimeONode} from "./compile/canvas-node-transform"
+export {ExecutableCanvas} from "./runtime/ExecutableCanvas"
+
+// ── Runtime types ─────────────────────────────────────────────────────────────
+export type {CTX, Fn, FnThis, Introspection, StackFrame} from "./runtime/runtime-types"
+
+// ── Errors ────────────────────────────────────────────────────────────────────
+export * from "./runtime/errors"
+
+// ── Inspection protocol (for debuggers / viewers) ─────────────────────────────
+export type {
+    zRFrame,
+    MsgRunner2Inspector,
+    MsgInspector2Runner,
+    RRunnerState,
+    DMsgCanvas,
+} from "./runtime/inspection/protocol"

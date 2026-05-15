@@ -1,13 +1,8 @@
 import { derived, get, writable } from 'svelte/store'
 import { browser } from '$app/environment'
 import _ from 'lodash'
-import type { ONode } from 'canvas-engine/src/compile/canvas-node-transform'
+import type { ONode, MsgInspector2Runner, MsgRunner2Inspector, zRFrame } from 'canvas-engine'
 import { type Edge, type Node } from '@xyflow/svelte'
-import {
-    type MsgInspector2Runner,
-    type MsgRunner2Inspector,
-    type zRFrame,
-} from 'canvas-engine/src/runtime/inspection/protocol'
 import * as Flatted from 'flatted'
 import { canvasToFlow, rawCanvasToFlow } from '$lib/canvas-to-flow'
 

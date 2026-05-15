@@ -22,7 +22,7 @@
     } from '$lib/store';
     import FNode from "$lib/client/FNode.svelte"
     import {get} from "svelte/store"
-    import type {ONode} from "canvas-engine/src/compile/canvas-node-transform"
+    import type {ONode} from "canvas-engine"
     import NodeContent from "$lib/client/NodeContent.svelte"
     import {Tab, TabGroup} from "@skeletonlabs/skeleton"
     import {color} from "$lib/color"
