@@ -15,8 +15,7 @@
     "dev": "this_workspace=`pwd`; yarn -s build && cd ../.. && node \"$this_workspace\"/build/main.js",
     "dev:inspect": "this_workspace=`pwd`; yarn -s build && cd ../.. && node --inspect \"$this_workspace\"/build/main.js",
     "dev:inspect-brk": "this_workspace=`pwd`; yarn -s build && cd ../.. && node --inspect-brk  \"$this_workspace\"/build/main.js",
-    "build:tsc": "tsc",
-    "build:lib": "esbuild src/lib.ts --bundle --loader:.ts=ts --platform=node \"--external:@babel/preset-typescript/*\" --outfile=dist/lib.js --sourcemap && tsc --emitDeclarationOnly"
+    "build:lib": "tsc -p tsconfig.json"
   },
   "dependencies": {
     "@langchain/community": "^0.0.44",
