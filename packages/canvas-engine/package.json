@@ -1,6 +1,6 @@
 {
   "name": "canvas-engine",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/lib.js",
   "module": "dist/lib.js",
   "types": "dist/lib.d.ts",
