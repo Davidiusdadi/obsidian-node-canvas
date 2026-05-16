@@ -4,11 +4,12 @@ import {execCanvas} from "./runtime/exec-canvas"
 import {ExecutableCanvas} from "./runtime/ExecutableCanvas"
 import {Introspection} from "./runtime/runtime-types"
 import {NodeCompiler} from "./compile/template"
-import _defaultCompilers from './node_library'
 
 // ── Engine entry ──────────────────────────────────────────────────────────────
 export {execCanvas} from "./runtime/exec-canvas"
-export const defaultCompilers: NodeCompiler[] = _defaultCompilers
+// Built-in node library was removed in the whalerust fork — callers must
+// supply their own `compilers:` to createCanvasEngine.
+export const defaultCompilers: NodeCompiler[] = []
 
 export type EngineOptions = {
     introspection?: Introspection

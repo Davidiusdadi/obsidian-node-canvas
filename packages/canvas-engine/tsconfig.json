@@ -16,5 +16,5 @@
 		"sourceMap": true
 	},
 	"exclude": ["node_modules" ],
-	"include": ["./src/lib.ts", "./src/main.ts"]
+	"include": ["./src/lib.ts"]
 }
