@@ -72,3 +72,14 @@ export type {
     RRunnerState,
     DMsgCanvas,
 } from "./runtime/inspection/protocol"
+
+// ── Reusable node-library primitives ──────────────────────────────────────────
+// Re-exported so downstream callers that pass a custom `compilers:` array can
+// still opt into the engine's stock building blocks (control flow via
+// `js`/`ts` code blocks, plus the canvas-IO magic-words for emitting on a
+// labeled edge or for the inject/return sub-canvas pattern). Pick what you
+// need; nothing is registered by default in this fork.
+export {js_to_fn} from "./runtime/js-block-to-fn"
+export {default as emitMagicCompiler} from "./node_library/magic-word/canvas-io/emit-input"
+export {default as injectMagicCompiler} from "./node_library/magic-word/canvas-io/inject"
+export {default as returnMagicCompiler} from "./node_library/magic-word/canvas-io/return"
