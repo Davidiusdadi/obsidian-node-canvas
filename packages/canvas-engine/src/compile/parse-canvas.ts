@@ -21,6 +21,18 @@ export type JSONCanvasNode = (LinkNode | TextNode | GenericNode & {
 }
 
 /**
+ * A canvas as data, before any parsing. `parseCanvasData` takes this instead of
+ * a path so callers that SYNTHESIZE a canvas (an inline snippet compiled to one
+ * node, a markdown file compiled to a linear chain) get the identical compile
+ * pipeline — magic words, compiler lookup, edge assignment — rather than a
+ * parallel implementation that drifts.
+ */
+export type RawCanvasData = {
+    nodes: JSONCanvasNode[]
+    edges: unknown[]
+}
+
+/**
  * - parse a canvas file (cnodes)
  * - go from cnode to onode (out-nodes)
  * - finalize onode.fn
@@ -32,6 +44,22 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
     let file_contents = await readFile(canvas_path_full, 'utf8')
     const canvas_data = JSONCanvas.fromString(file_contents)
 
+    return parseCanvasData(
+        {nodes: canvas_data.getNodes() as JSONCanvasNode[], edges: canvas_data.getEdges()},
+        canvas_path_full,
+        config
+    )
+}
+
+/** The path-free half of {@link parseCanvas}. `canvas_path_full` is only used
+ *  to resolve relative `file` nodes and is otherwise inert — a synthesized
+ *  canvas may pass any absolute path inside the vault. */
+export async function parseCanvasData(
+    canvas_data: RawCanvasData,
+    canvas_path_full: string,
+    config: GlobalContext
+): Promise<ParsedCanvas> {
+
     const context: ExecutionContext = {
         vault_dir: config.vault_dir,
         canvas_path: canvas_path_full
@@ -41,7 +69,7 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
 
     const magic_words = config.nodeCompilers.filter(c => c.magic_word).map(c => c.lang)
     const magic_word_regex = new RegExp(`^(\\s*[_*]+(${magic_words.join('|')}):?[_*]+:?\\s*).+`, 'i')
-    for (const cnode of canvas_data.getNodes() as JSONCanvasNode[]) {
+    for (const cnode of canvas_data.nodes) {
         let onode: RuntimeONode | undefined = undefined
 
 
@@ -148,7 +176,7 @@ export async function parseCanvas(canvas_path: string, config: GlobalContext): P
 
     }
 
-    const all_edges = canvas_data.getEdges().map((edge) => {
+    const all_edges = canvas_data.edges.map((edge) => {
         return ZEdge.parse(edge)
     })
 

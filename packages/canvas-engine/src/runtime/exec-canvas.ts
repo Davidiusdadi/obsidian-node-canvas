@@ -3,19 +3,27 @@ import z from "zod"
 import _ from "lodash"
 import {logger} from "../globals"
 
-import {GlobalContext, InvocationResult} from "../types"
+import {GlobalContext, InvocationResult, MINT_LABEL} from "../types"
 import chalk from "chalk"
 import {ZEdge} from "../compile/canvas-edge-transform"
 import {CTX, StackFrame} from "./runtime-types"
-import {InputsNotFullfilled, NodeReturnNotIntendedByDesign} from "./errors"
+import {DeadlineExceeded, InputsNotFullfilled, NodeReturnNotIntendedByDesign} from "./errors"
 import {ExecutableCanvas} from "./ExecutableCanvas"
 import {zRFrameComplete, zRFrameNew} from "./inspection/protocol"
+
+export type ExecCanvasOptions = {
+    /** Seeds every start frame's `input`. Without this the only way anything
+     *  reaches a start node is the `on-resource-event` tunnel, which makes a
+     *  canvas un-parameterizable — a flow that takes arguments needs its
+     *  arguments to BE the input. `current_event` stays untouched for compat. */
+    initial_input?: any
+}
 
 /**
  * This holds the main execution loop.
  * It receives fully parsed and configured nodes ready for execution.
  **/
-export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalContext) {
+export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalContext, options?: ExecCanvasOptions) {
 
 
     const stack = gctx.stack
@@ -46,7 +54,7 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
         push_frame({
             parent: -1,
             node,
-            input: undefined,
+            input: options?.initial_input,
             state: {},
             internal_state: {
                 inject_return: []
@@ -201,6 +209,13 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
             emit: (label: string | undefined, emission: any) => {
                 logger.trace(`<frame ${frame.id} emitting: [${label ?? '-'}] >`)
                 logger.debug('emitting: ', label, emission)
+                // The OUTPUT SINK. `mint` is collected regardless of wiring, so a
+                // one-node canvas can produce results without an outgoing edge —
+                // and it still travels the labelled edges below, so a canvas that
+                // wants to post-process its own mints can.
+                if (label === MINT_LABEL) {
+                    gctx.minted.push(emission)
+                }
                 const edges_label_out = frame.node.edges.filter((edge) => {
                     return edge.direction === 'forward' && edge.from === frame.node.id && edge.label?.trim() === label
                 })
@@ -262,85 +277,129 @@ export async function execCanvas(inital_canvas: ExecutableCanvas, gctx: GlobalCo
             }
             console.error('(trace): input', frame.input)
             console.error('(trace): state', frame.state)
+            // Tell the inspector WHICH node died before the throw unwinds past
+            // every consumer. Without this, `reason: 'error'` was a shape nothing
+            // ever emitted and a viewer could only report "the run failed".
+            gctx.introspection?.inform({
+                type: 'frame-complete',
+                frame,
+                reason: 'error',
+                return_canceled: true,
+                was_invoked: true,
+                return_emissions: 0,
+                return_value: e instanceof Error ? e.message : String(e)
+            } satisfies z.input<typeof zRFrameComplete>)
             throw e
         }
 
     }
 
-    parallel_execution: {
-        let last_ctx: CTX | null = null
-        let last_return_value: any | undefined | null
+    // The deadline. Two mechanisms, because either alone leaks: the loop-top
+    // check catches a run that is busy but overrunning, and the racing signal
+    // catches a run parked on a node that will never resolve (the engine cannot
+    // cancel user code — see DeadlineExceeded for what the caller is promised).
+    let deadline_timer: ReturnType<typeof setTimeout> | undefined
+    const deadline_signal: Promise<'deadline'> | null = gctx.deadline === undefined
+        ? null
+        : new Promise<'deadline'>((resolve) => {
+            deadline_timer = setTimeout(() => resolve('deadline'), Math.max(0, gctx.deadline! - Date.now()))
+            // Never hold the process open for a deadline that is only a backstop.
+            ;(deadline_timer as any)?.unref?.()
+        })
+    const past_deadline = () => gctx.deadline !== undefined && Date.now() > gctx.deadline
 
-        activity: while (true) {
+    try {
+        parallel_execution: {
+            let last_ctx: CTX | null = null
+            let last_return_value: any | undefined | null
 
-            logger.trace(`<stats: active: ${active_frames.length}; queue: ${stack.length}>`)
+            activity: while (true) {
 
-            if (active_frames.length > 0) {
-                const activity_completed = await Promise.race([
-                    ...active_frames.map(f => f.promise),
-                    active_frame_modified.promise
-                ])
+                logger.trace(`<stats: active: ${active_frames.length}; queue: ${stack.length}>`)
 
-                if (activity_completed === 'modified') {
-                    logger.trace('<modivied active active_frames>')
-                    active_frame_modified = promiseWithResolver<'modified'>()
-                    // go on and start a new frame if possible
-                } else if (activity_completed.type === 'frame-complete') {
-                    logger.trace(`<frame: ${activity_completed.frame.id} fully complete >`)
-                } else if (activity_completed.type === 'frame-pushback') {
-                    // nothing to do
-                } else {
-                    logger.error('unexpected activity_completed', activity_completed)
-                    throw new Error('unexpected activity_completed')
+                if (past_deadline()) {
+                    throw new DeadlineExceeded(gctx.deadline!)
                 }
 
-            }
-            //await new Promise((resolve) => setTimeout(resolve, 1000))
-            while (active_frames.length < (gctx.parallel ?? 100)) {
-                const frame = pop_frame()
+                if (active_frames.length > 0) {
+                    const activity_completed = await Promise.race([
+                        ...active_frames.map(f => f.promise),
+                        active_frame_modified.promise,
+                        ...(deadline_signal ? [deadline_signal] : [])
+                    ])
 
-                if (frame === null) {
-                    if (active_frames.length > 0 || stack.length > 0) {
-                        continue activity;// wait for more frames to complete
+                    if (activity_completed === 'deadline') {
+                        throw new DeadlineExceeded(gctx.deadline!)
+                    } else if (activity_completed === 'modified') {
+                        logger.trace('<modivied active active_frames>')
+                        active_frame_modified = promiseWithResolver<'modified'>()
+                        // go on and start a new frame if possible
+                    } else if (activity_completed.type === 'frame-complete') {
+                        logger.trace(`<frame: ${activity_completed.frame.id} fully complete >`)
+                    } else if (activity_completed.type === 'frame-pushback') {
+                        // nothing to do
                     } else {
-                        break activity // end of execution
+                        logger.error('unexpected activity_completed', activity_completed)
+                        throw new Error('unexpected activity_completed')
                     }
+
                 }
-                logger.trace(`<frame ${frame?.id} invoking>`)
+                //await new Promise((resolve) => setTimeout(resolve, 1000))
+                while (active_frames.length < (gctx.parallel ?? 100)) {
+                    const frame = pop_frame()
 
-                const activity = invoke_frame(frame).then(ac => {
-                    // avoiding a reassigning active_frames
-                    let splice_index = active_frames.findIndex(({frame: f}) => f === frame)
-                    if (splice_index !== -1) {
-                        active_frames.splice(splice_index, 1)
-                    }
-
-                    if (ac.type === 'frame-pushback') {
-                        logger.trace(`<frame ${ac.frame.id} pushback [${ac.frame.is_aggregating ? 'aggs' : 'zip'}]' >`)
-                        if (ac.frame.is_aggregating) {
-                            stack.unshift(frame)
+                    if (frame === null) {
+                        if (active_frames.length > 0 || stack.length > 0) {
+                            continue activity;// wait for more frames to complete
+                        } else {
+                            break activity // end of execution
                         }
                     }
-                    if (ac.type === 'frame-complete') {
-                        logger.trace(`<frame ${frame.id} complete>`)
-                        gctx.introspection?.inform(ac)
-                        last_ctx = ac.frame.ctx
-                        last_return_value = ac.return_value
-                    }
-                    return ac
-                })
+                    logger.trace(`<frame ${frame?.id} invoking>`)
 
-                active_frames.push({
-                    frame,
-                    promise: activity
-                })
+                    const activity = invoke_frame(frame).then(ac => {
+                        // avoiding a reassigning active_frames
+                        let splice_index = active_frames.findIndex(({frame: f}) => f === frame)
+                        if (splice_index !== -1) {
+                            active_frames.splice(splice_index, 1)
+                        }
+
+                        if (ac.type === 'frame-pushback') {
+                            logger.trace(`<frame ${ac.frame.id} pushback [${ac.frame.is_aggregating ? 'aggs' : 'zip'}]' >`)
+                            if (ac.frame.is_aggregating) {
+                                stack.unshift(frame)
+                            }
+                        }
+                        if (ac.type === 'frame-complete') {
+                            logger.trace(`<frame ${frame.id} complete>`)
+                            gctx.introspection?.inform(ac)
+                            last_ctx = ac.frame.ctx
+                            last_return_value = ac.return_value
+                        }
+                        return ac
+                    })
+
+                    active_frames.push({
+                        frame,
+                        promise: activity
+                    })
+                }
+            }
+
+            return {
+                /** Whichever frame finished LAST — a debugging convenience, not a
+                 *  results contract. Anything that needs "what did this run produce"
+                 *  reads `minted`. */
+                return_value: last_return_value,
+                last_ctx,
+                /** The output sink: every `ctx.emit('mint', …)`, in emission order. */
+                minted: gctx.minted,
+                /** Whatever a node put on `gctx.summary` (run coordinates). */
+                summary: gctx.summary
             }
         }
-
-        return {
-            return_value: last_return_value,
-            last_ctx
-        }
+    } finally {
+        if (deadline_timer !== undefined) clearTimeout(deadline_timer)
     }
 }
 

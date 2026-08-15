@@ -46,13 +46,23 @@ export const createCanvasEngine = async (
 
 export default createCanvasEngine
 
+export type {ExecCanvasOptions} from "./runtime/exec-canvas"
+
+
 // ── Global state ──────────────────────────────────────────────────────────────
-export {GlobalContext} from "./types"
+export {GlobalContext, MINT_LABEL} from "./types"
 export type {ParsedCanvas, InvocationResult} from "./types"
 
 // ── Authoring NodeCompilers ───────────────────────────────────────────────────
 export type {NodeCompiler, CompilationContext} from "./compile/template"
 export type {ExecutionContext} from "./compile/types"
+
+// ── Compilation ───────────────────────────────────────────────────────────────
+// `parseCanvasData` is the path-free half of `parseCanvas`: hand it nodes+edges
+// and it runs the identical compile pipeline. This is what a synthesizing
+// frontend (inline snippet → one node, markdown → linear chain) builds on.
+export {parseCanvas, parseCanvasData} from "./compile/parse-canvas"
+export type {RawCanvasData, JSONCanvasNode} from "./compile/parse-canvas"
 
 // ── Canvas model ──────────────────────────────────────────────────────────────
 export type {ONode, ONodeFile, RuntimeONode} from "./compile/canvas-node-transform"
